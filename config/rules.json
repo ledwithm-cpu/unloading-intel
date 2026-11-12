@@ -1,7 +1,7 @@
 {
   "activity": {
-    "ghost_max_conf": 0.5,
-    "ghost_max_std_px": 6,
+    "ghost_max_conf": 0.55,
+    "ghost_max_std_px": 8,
     "belt_reach_px": 12,
     "smooth_samples": 5,
     "active_speed": 0.12,
@@ -35,5 +35,9 @@
     "pressure_min_occupancy": 0.75,
     "pressure_max_waiting": 0.5,
     "pressure_min_seconds": 20
+  },
+  "safety": {
+    "crossing_max_seconds": 3.0,
+    "leaning_min_seconds": 5
   }
 }

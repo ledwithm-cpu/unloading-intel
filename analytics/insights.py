@@ -11,7 +11,8 @@ import numpy as np
 
 LABEL = {"flowing": "Flowing", "running_empty": "Running near-empty", "stopped_loaded": "Stopped with freight",
          "stopped_empty": "Stopped and empty", "release_window": "People free to release",
-         "under_pressure": "Bay under pressure", "low_engagement": "3+ present, at most 1 unloading"}
+         "under_pressure": "Bay under pressure", "low_engagement": "3+ present, at most 1 unloading",
+         "belt_crossing": "Crossed the belt", "leaning_on_belt": "Leaning on the belt"}
 
 
 def mmss(s):

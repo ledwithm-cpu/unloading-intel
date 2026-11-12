@@ -23,7 +23,8 @@ CREATE TABLE person_activity (
     hands_on_belt INTEGER,    -- 1 if a wrist is over the belt zone
     wrist_speed REAL,         -- body-heights per second
     body_speed REAL,          -- body-heights per second
-    state TEXT                -- belt_work / off_belt / waiting
+    state TEXT,               -- belt_work / off_belt / waiting
+    detail TEXT               -- finer label where known: leaning / crossing
 );
 CREATE INDEX idx_pa_t ON person_activity (t_sec);
 """
@@ -86,7 +87,7 @@ def run(con, zones_path="config/zones.json", rules_path="config/rules.json"):
         conf = np.array([r[7] for r in recs])
         centre = (box[:, :2] + box[:, 2:]) / 2
         # a "person" that never moves and is never confidently a person is freight (e.g. a printed sack)
-        if len(recs) > 50 and conf.mean() < rules["ghost_max_conf"] and centre.std(0).max() < rules["ghost_max_std_px"]:
+        if len(recs) >= 10 and conf.mean() < rules["ghost_max_conf"] and centre.std(0).max() < rules["ghost_max_std_px"]:
             dropped.append(tid)
             continue
         hips_ok = (kp[:, [L_HIP, R_HIP], 2] > 0.3).all(1)
@@ -123,29 +124,42 @@ def run(con, zones_path="config/zones.json", rules_path="config/rules.json"):
         # Someone is "working the belt" for a few seconds either side of each touch: the pick, the turn to
         # drop, and the return. Movement with no touch nearby is activity away from the belt.
         touch_t = t[at_freight & (np.maximum(wrist_s, body_s) >= rules["touch_min_speed"])]
-        states, last_touch = [], None
+        states, details, last_touch = [], [], None
         for i in range(len(recs)):
             moving = max(wrist_s[i], body_s[i]) >= rules["active_speed"]
-            if len(touch_t) and np.abs(touch_t - t[i]).min() <= rules["cycle_window_seconds"]:
+            detail = None
+            if not moving:
+                state = "waiting"
+                if belt_s[i] >= 0.5:
+                    detail = "leaning"       # a still hand on the belt is a lean, not work
+            elif len(touch_t) and np.abs(touch_t - t[i]).min() <= rules["cycle_window_seconds"]:
                 state = "belt_work"
                 past = touch_t[touch_t <= t[i]]
                 last_touch = past.max() if len(past) else last_touch
-            elif (states and states[-1] == "belt_work" and moving and t[i] - t[i - 1] <= 0.45
+            elif (states and states[-1] == "belt_work" and t[i] - t[i - 1] <= 0.45
                   and last_touch is not None and t[i] - last_touch <= rules["carry_max_seconds"]):
                 state = "belt_work"          # still carrying what they picked: the cycle runs until they stop
-            elif moving:
-                state = "off_belt"
             else:
-                state = "waiting"
+                state = "off_belt"
             states.append(state)
+            details.append(detail)
+        # same idea backwards: fetching a parcel (from a cage or pile) and bringing it to the belt
+        next_touch = None
+        for i in range(len(recs) - 1, -1, -1):
+            if states[i] == "belt_work":
+                future = touch_t[touch_t >= t[i]]
+                next_touch = future.min() if len(future) else next_touch
+            elif (states[i] == "off_belt" and i + 1 < len(recs) and states[i + 1] == "belt_work" and t[i + 1] - t[i] <= 0.45
+                  and next_touch is not None and next_touch - t[i] <= rules["carry_max_seconds"]):
+                states[i] = "belt_work"
         for i, r in enumerate(recs):
-            state = states[i]
+            state, detail = states[i], details[i]
             zone = zone_of((float(ref[i, 0]), float(ref[i, 1])), polys, priority)
             out.append((r[0], r[1], tid, zone, int(on_belt[i]), round(float(wrist_s[i]), 3),
-                        round(float(body_s[i]), 3), state))
+                        round(float(body_s[i]), 3), state, detail))
 
     con.executescript(SCHEMA)
-    con.executemany("INSERT INTO person_activity VALUES (?,?,?,?,?,?,?,?)", out)
+    con.executemany("INSERT INTO person_activity VALUES (?,?,?,?,?,?,?,?,?)", out)
     con.execute("INSERT OR REPLACE INTO video_meta VALUES ('ghost_tracks_dropped', ?)", (json.dumps(dropped),))
     con.commit()
     return len(out), dropped
