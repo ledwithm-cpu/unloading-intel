@@ -148,7 +148,7 @@
   },
   {
    "id": "belt_work",
-   "title": "70% of people's time went into working the belt",
+   "title": "70% of people's time went into unloading",
    "what": "70% of person-time was spent unloading (picking from the belt, carrying, returning), 14% on other activity and 15% waiting. While the belt flowed, 3.7 of 4.6 people were unloading.",
    "why": "Unloading falls from 80% when the belt flows to 26% when it is stopped and empty, and waiting rises from 11% to 34%. People follow the belt, which points at the process, not the people. For 5% of the session three or more people were present with at most one unloading.",
    "action": "Fix stops and gaps first. Then look at the other activity: some is stacking and staging, some is not work, and this camera cannot yet tell them apart.",

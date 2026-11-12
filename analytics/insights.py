@@ -93,7 +93,7 @@ def build(con):
         },
         {
             "id": "belt_work",
-            "title": f"{float(belt_work.sum() / present.sum()):.0%} of people's time went into working the belt",
+            "title": f"{float(belt_work.sum() / present.sum()):.0%} of people's time went into unloading",
             "what": f"{float(belt_work.sum() / present.sum()):.0%} of person-time was spent unloading (picking from the belt, carrying, returning), "
                     f"{float(off_belt.sum() / present.sum()):.0%} on other activity and {float(waiting.sum() / present.sum()):.0%} waiting. "
                     f"While the belt flowed, {float(belt_work[state == 'flowing'].mean()):.1f} of {float(present[state == 'flowing'].mean()):.1f} people were unloading.",
