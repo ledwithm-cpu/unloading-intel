@@ -155,6 +155,29 @@
           660
         ]
       ]
+    },
+    "belt_reach": {
+      "label": "Belt reach (hands)",
+      "kind": "reach",
+      "note": "Where a hand counts as at the belt. Wider than the belt on the pile side: hands held above the belt surface appear higher in the image from this camera angle.",
+      "polygon": [
+        [
+          195,
+          165
+        ],
+        [
+          272,
+          60
+        ],
+        [
+          1265,
+          455
+        ],
+        [
+          1232,
+          620
+        ]
+      ]
     }
   },
   "zone_priority": [

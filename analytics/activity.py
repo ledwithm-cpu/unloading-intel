@@ -53,6 +53,7 @@ def run(con, zones_path="config/zones.json", rules_path="config/rules.json"):
     rules = json.load(open(rules_path))["activity"]
     polys, priority = load_zones(zones_path)
     belt = polys["belt"]
+    reach = polys.get("belt_reach", belt)      # hands-at-belt area, perspective-corrected
 
     # freight along the belt over time, so a touch only counts where there is something to pick up
     H = homography(json.load(open(zones_path))["zones"]["belt"]["polygon"])
@@ -95,7 +96,7 @@ def run(con, zones_path="config/zones.json", rules_path="config/rules.json"):
         at_freight = np.zeros(len(recs), bool)
         for i in range(len(recs)):
             for w in wr[i]:
-                if w[2] > 0.3 and cv2.pointPolygonTest(belt, (float(w[0]), float(w[1])), True) >= -rules["belt_reach_px"]:
+                if w[2] > 0.3 and cv2.pointPolygonTest(reach, (float(w[0]), float(w[1])), True) >= -rules["belt_reach_px"]:
                     on_belt[i] = True
                     if freight_near(float(t[i]), float(w[0]), float(w[1])) >= rules["freight_min_occupancy"]:
                         at_freight[i] = True

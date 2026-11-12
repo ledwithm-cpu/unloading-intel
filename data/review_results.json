@@ -35,7 +35,8 @@
     "rule_change_after_review": {
       "change": "Reviewer's suggestion adopted: 'working' now means working the belt (a hand at the belt next to freight, plus 4 seconds either side for the pick, drop and return). Movement with no belt touch is 'active away from the belt'. Still is 'waiting'.",
       "effect_on_the_six_errors": "None of the six is counted as working the belt any more: five fall in 'active away from the belt', one in 'waiting'.",
-      "status": "The new labels have not yet been reviewed by a person. data/review_reel.mp4 was regenerated with them for a second pass."
+      "status": "The new labels have not yet been reviewed by a person. data/review_reel.mp4 was regenerated with them for a second pass.",
+      "second_correction": "Reviewer spotted a pile-side worker clearing the belt shown as off belt. Cause: from this camera angle, hands held above the far side of the belt appear 30-50 px above the belt zone. Added a 'belt_reach' zone in config/zones.json that extends the hand-contact area on that side. Across 15 settings of the freight-proximity thresholds, belt-work share stayed between 57% and 65%."
     }
   }
 }
