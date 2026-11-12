@@ -5,7 +5,10 @@
     "belt_reach_px": 12,
     "smooth_samples": 5,
     "active_speed": 0.12,
-    "hands_vs_body_ratio": 1.5
+    "touch_min_speed": 0.1,
+    "cycle_window_seconds": 4,
+    "freight_reach_bins": 3,
+    "freight_min_occupancy": 0.25
   },
   "belt": {
     "smooth_samples": 4,
@@ -16,8 +19,8 @@
     "belt_min_seconds": 10,
     "bridge_gap_seconds": 2,
     "low_engagement_min_present": 3,
-    "low_engagement_max_handling": 1.0,
-    "low_engagement_min_seconds": 10
+    "low_engagement_min_seconds": 10,
+    "low_engagement_max_belt_work": 1.0
   },
   "reallocation": {
     "smooth_seconds": 10,

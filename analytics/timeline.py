@@ -1,4 +1,4 @@
-"""Build the per-second timeline: belt state + how many people were working / walking / waiting.
+"""Build the per-second timeline: belt state + how many people were working the belt / active away from it / waiting.
 
 Reads `belt_samples` and `person_activity`, writes `timeline` (one row per second of video).
 """
@@ -16,8 +16,8 @@ CREATE TABLE timeline (
     occupancy REAL,           -- 0..1 share of belt surface covered by freight
     belt_moving INTEGER,
     throughput REAL,          -- freight flow index: occupancy x belt speed (0 when stopped)
-    n_present REAL, n_handling REAL, n_moving REAL, n_waiting REAL,
-    by_zone TEXT              -- JSON {zone: {present, handling, moving, waiting}}
+    n_present REAL, n_belt_work REAL, n_off_belt REAL, n_waiting REAL,
+    by_zone TEXT              -- JSON {zone: {present, belt_work, off_belt, waiting}}
 );
 """
 ZONES = ["dock_door", "pile_side", "floor_side", "far_end", "away"]
@@ -68,7 +68,7 @@ def run(con, rules_path="config/rules.json"):
         nf = max(n_frames.get(s, 1), 1)
         bz = {z: {k2: round(v / nf, 2) for k2, v in counts[s][z].items()} for z in ZONES if z in counts[s]}
         tot = lambda key: round(sum(v.get(key, 0) for v in bz.values()), 2)
-        out.append((s, state, o, mv, thr, tot("present"), tot("handling"), tot("moving"), tot("waiting"), json.dumps(bz)))
+        out.append((s, state, o, mv, thr, tot("present"), tot("belt_work"), tot("off_belt"), tot("waiting"), json.dumps(bz)))
     con.executescript(SCHEMA)
     con.executemany("INSERT INTO timeline VALUES (?,?,?,?,?,?,?,?,?,?)", out)
     con.commit()

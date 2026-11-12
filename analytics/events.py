@@ -4,7 +4,7 @@ Event types
   running_empty   belt moving with almost nothing on it (supply gap)
   stopped_loaded  belt stopped with freight on it (blockage / manual stop)
   stopped_empty   belt stopped and bare (full idle)
-  low_engagement  several people present, at most one working
+  low_engagement  several people present, at most one working the belt
   release_window  belt idle and people waiting long enough that they could help another bay
   under_pressure  belt saturated or blocked with everyone busy: this bay could use help
 """
@@ -15,7 +15,7 @@ DROP TABLE IF EXISTS events;
 CREATE TABLE events (
     id INTEGER PRIMARY KEY,
     type TEXT, start_sec INTEGER, end_sec INTEGER, duration_sec INTEGER,
-    people_present REAL, people_handling REAL, people_waiting REAL,
+    people_present REAL, people_belt_work REAL, people_waiting REAL,
     person_seconds_waiting REAL,
     occupancy REAL,
     details TEXT               -- JSON: per-zone averages
@@ -44,14 +44,14 @@ def _segments(flags, min_len, max_gap):
 
 def run(con, rules_path="config/rules.json"):
     rules = json.load(open(rules_path))["events"]
-    tl = con.execute("SELECT t_sec, belt_state, occupancy, n_present, n_handling, n_waiting, by_zone "
+    tl = con.execute("SELECT t_sec, belt_state, occupancy, n_present, n_belt_work, n_waiting, by_zone "
                      "FROM timeline ORDER BY t_sec").fetchall()
     secs = [r[0] for r in tl]
 
     def summarise(kind, a, b):
         rows = tl[a:b + 1]
         n = len(rows)
-        zone_tot = {z: {"present": 0.0, "handling": 0.0, "waiting": 0.0} for z in ZONES}
+        zone_tot = {z: {"present": 0.0, "belt_work": 0.0, "waiting": 0.0} for z in ZONES}
         for r in rows:
             for z, v in json.loads(r[6]).items():
                 for key in zone_tot[z]:
@@ -67,7 +67,7 @@ def run(con, rules_path="config/rules.json"):
         flags = [r[1] == kind for r in tl]
         for a, b in _segments(flags, rules["belt_min_seconds"], rules["bridge_gap_seconds"]):
             events.append(summarise(kind, a, b))
-    flags = [r[3] >= rules["low_engagement_min_present"] and r[4] <= rules["low_engagement_max_handling"] for r in tl]
+    flags = [r[3] >= rules["low_engagement_min_present"] and r[4] <= rules["low_engagement_max_belt_work"] for r in tl]
     for a, b in _segments(flags, rules["low_engagement_min_seconds"], rules["bridge_gap_seconds"]):
         events.append(summarise("low_engagement", a, b))
 
@@ -88,7 +88,7 @@ def run(con, rules_path="config/rules.json"):
 
     events.sort(key=lambda e: e[1])
     con.executescript(SCHEMA)
-    con.executemany("INSERT INTO events (type,start_sec,end_sec,duration_sec,people_present,people_handling,"
+    con.executemany("INSERT INTO events (type,start_sec,end_sec,duration_sec,people_present,people_belt_work,"
                     "people_waiting,person_seconds_waiting,occupancy,details) VALUES (?,?,?,?,?,?,?,?,?,?)", events)
     con.commit()
     return len(events)

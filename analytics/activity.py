@@ -1,4 +1,4 @@
-"""Turn raw detections into per-person activity: which zone, and handling / moving / waiting.
+"""Turn raw detections into per-person activity: which zone, and working the belt / active away from it / waiting.
 
 Reads `detections`, writes `person_activity`. No video needed.
 All thresholds live in config/rules.json so they can be tuned and defended in one place.
@@ -6,8 +6,12 @@ All thresholds live in config/rules.json so they can be tuned and defended in on
 import json
 from collections import defaultdict
 
+import bisect
+
 import cv2
 import numpy as np
+
+from pipeline.belt import N_BINS, W as STRIP_W, homography
 
 L_WRIST, R_WRIST, L_HIP, R_HIP = 9, 10, 11, 12
 
@@ -19,7 +23,7 @@ CREATE TABLE person_activity (
     hands_on_belt INTEGER,    -- 1 if a wrist is over the belt zone
     wrist_speed REAL,         -- body-heights per second
     body_speed REAL,          -- body-heights per second
-    state TEXT                -- handling / moving / waiting
+    state TEXT                -- belt_work / off_belt / waiting
 );
 CREATE INDEX idx_pa_t ON person_activity (t_sec);
 """
@@ -50,6 +54,20 @@ def run(con, zones_path="config/zones.json", rules_path="config/rules.json"):
     polys, priority = load_zones(zones_path)
     belt = polys["belt"]
 
+    # freight along the belt over time, so a touch only counts where there is something to pick up
+    H = homography(json.load(open(zones_path))["zones"]["belt"]["polygon"])
+    belt_t, belt_bins = [], []
+    for bt, bins in con.execute("SELECT t_sec, bins FROM belt_samples ORDER BY t_sec"):
+        belt_t.append(bt)
+        belt_bins.append(json.loads(bins))
+
+    def freight_near(t_sec, x, y):
+        j = min(max(bisect.bisect_left(belt_t, t_sec), 0), len(belt_t) - 1)
+        sx = cv2.perspectiveTransform(np.float32([[[x, y]]]), H)[0, 0, 0]
+        b = int(np.clip(sx / STRIP_W * N_BINS, 0, N_BINS - 1))
+        lo, hi = max(0, b - rules["freight_reach_bins"]), min(N_BINS, b + rules["freight_reach_bins"] + 1)
+        return max(max(belt_bins[k][lo:hi]) for k in range(max(0, j - 2), min(len(belt_t), j + 3)))
+
     rows = con.execute(
         "SELECT frame_idx, t_sec, track_id, x1, y1, x2, y2, conf, keypoints FROM detections "
         "WHERE track_id IS NOT NULL ORDER BY track_id, frame_idx").fetchall()
@@ -74,10 +92,13 @@ def run(con, zones_path="config/zones.json", rules_path="config/rules.json"):
 
         wr = kp[:, [L_WRIST, R_WRIST], :]
         on_belt = np.zeros(len(recs), bool)
+        at_freight = np.zeros(len(recs), bool)
         for i in range(len(recs)):
             for w in wr[i]:
                 if w[2] > 0.3 and cv2.pointPolygonTest(belt, (float(w[0]), float(w[1])), True) >= -rules["belt_reach_px"]:
                     on_belt[i] = True
+                    if freight_near(float(t[i]), float(w[0]), float(w[1])) >= rules["freight_min_occupancy"]:
+                        at_freight[i] = True
 
         dt = np.diff(t, prepend=t[0])
         ok = (dt > 0) & (dt <= 0.45)
@@ -94,14 +115,18 @@ def run(con, zones_path="config/zones.json", rules_path="config/rules.json"):
             return np.array([f(a[max(0, i - k):i + k + 1]) for i in range(len(a))])
         wrist_s, body_s, belt_s = roll(wrist, np.median), roll(body, np.median), roll(on_belt.astype(float), np.mean)
 
+        # A belt touch = a hand at the belt, next to freight, while the hands are moving.
+        # Resting a hand on the belt, or touching a bare stretch of it, does not count.
+        # Someone is "working the belt" for a few seconds either side of each touch: the pick, the turn to
+        # drop, and the return. Movement with no touch nearby is activity away from the belt.
+        touch_t = t[at_freight & (np.maximum(wrist_s, body_s) >= rules["touch_min_speed"])]
         for i, r in enumerate(recs):
-            # one question first: is this person moving at all? then: hands working, or walking?
-            if max(wrist_s[i], body_s[i]) < rules["active_speed"]:
-                state = "waiting"
-            elif belt_s[i] >= 0.3 or wrist_s[i] >= rules["hands_vs_body_ratio"] * body_s[i]:
-                state = "handling"
+            if len(touch_t) and np.abs(touch_t - t[i]).min() <= rules["cycle_window_seconds"]:
+                state = "belt_work"
+            elif max(wrist_s[i], body_s[i]) >= rules["active_speed"]:
+                state = "off_belt"
             else:
-                state = "moving"
+                state = "waiting"
             zone = zone_of((float(ref[i, 0]), float(ref[i, 1])), polys, priority)
             out.append((r[0], r[1], tid, zone, int(on_belt[i]), round(float(wrist_s[i]), 3),
                         round(float(body_s[i]), 3), state))

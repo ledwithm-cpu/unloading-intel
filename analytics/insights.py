@@ -11,7 +11,7 @@ import numpy as np
 
 LABEL = {"flowing": "Flowing", "running_empty": "Running near-empty", "stopped_loaded": "Stopped with freight",
          "stopped_empty": "Stopped and empty", "release_window": "People free to release",
-         "under_pressure": "Bay under pressure", "low_engagement": "Few people working"}
+         "under_pressure": "Bay under pressure", "low_engagement": "3+ present, at most 1 on the belt"}
 
 
 def mmss(s):
@@ -19,13 +19,13 @@ def mmss(s):
 
 
 def build(con):
-    tl = con.execute("SELECT t_sec, belt_state, occupancy, throughput, n_present, n_handling, n_moving, n_waiting "
+    tl = con.execute("SELECT t_sec, belt_state, occupancy, throughput, n_present, n_belt_work, n_off_belt, n_waiting "
                      "FROM timeline ORDER BY t_sec").fetchall()
     n = len(tl)
     state = np.array([r[1] for r in tl])
-    occ, thr, present, handling, waiting = (np.array([r[i] for r in tl]) for i in (2, 3, 4, 5, 7))
-    ev = [dict(zip(("id", "type", "start", "end", "duration", "present", "handling", "waiting", "wait_person_sec", "occupancy"), r))
-          for r in con.execute("SELECT id,type,start_sec,end_sec,duration_sec,people_present,people_handling,"
+    occ, thr, present, belt_work, off_belt, waiting = (np.array([r[i] for r in tl]) for i in (2, 3, 4, 5, 6, 7))
+    ev = [dict(zip(("id", "type", "start", "end", "duration", "present", "belt_work", "waiting", "wait_person_sec", "occupancy"), r))
+          for r in con.execute("SELECT id,type,start_sec,end_sec,duration_sec,people_present,people_belt_work,"
                                "people_waiting,person_seconds_waiting,occupancy FROM events ORDER BY start_sec")]
 
     def evidence(types, k=4):
@@ -37,6 +37,8 @@ def build(con):
     secs = {s: int((state == s).sum()) for s in LABEL}
     lost = n - secs["flowing"]
     wait_share = {s: float(waiting[state == s].sum() / max(present[state == s].sum(), 1)) for s in LABEL}
+    share_of = lambda arr, st: float(arr[state == st].sum() / max(present[state == st].sum(), 1))
+    low_secs = sum(e["duration"] for e in ev if e["type"] == "low_engagement")
     stopped = (state == "stopped_loaded") | (state == "stopped_empty")
     best60 = np.convolve(thr, np.ones(60) / 60, mode="valid")
     best_at = int(best60.argmax())
@@ -49,7 +51,7 @@ def build(con):
         "belt_state_share": share, "belt_state_seconds": secs,
         "productive_share": share["flowing"], "lost_seconds": lost,
         "avg_people": float(present.mean()),
-        "person_minutes": {"present": float(present.sum() / 60), "working": float(handling.sum() / 60), "waiting": float(waiting.sum() / 60)},
+        "person_minutes": {"present": float(present.sum() / 60), "belt_work": float(belt_work.sum() / 60), "off_belt": float(off_belt.sum() / 60), "waiting": float(waiting.sum() / 60)},
         "throughput_vs_best_minute": float(thr.mean() / best60.max()),
         "best_minute_start_sec": best_at,
         "sentence": f"The belt moved freight {share['flowing']:.0%} of the time. The other {lost / 60:.0f} minutes of {n / 60:.0f} were lost to stops and gaps.",
@@ -90,16 +92,18 @@ def build(con):
             "evidence": [{"t_sec": best_at, "label": f"{mmss(best_at)} · best sustained minute"}] + evidence(("stopped_empty",), 2),
         },
         {
-            "id": "waiting",
-            "title": "About a fifth of paid time on the floor was spent waiting",
-            "what": f"{waiting.sum() / 60:.0f} of {present.sum() / 60:.0f} person-minutes in view were waiting ({float(waiting.sum() / present.sum()):.0%}). "
-                    f"{float(waiting[state != 'flowing'].sum() / 60):.0f} of those fell while the belt was stopped or empty.",
-            "why": "Waiting rises from "
-                   f"{wait_share['flowing']:.0%} when the belt flows to {wait_share['stopped_empty']:.0%} when it is stopped and empty. "
-                   "The waiting follows the belt, which points at the process, not the people.",
-            "action": "Fix stops and gaps first. If waiting stays high at one position after that, rebalance who stands where.",
-            "metric": {"label": "Time waiting", "value": f"{float(waiting.sum() / present.sum()):.0%}"},
-            "evidence": evidence(("stopped_empty", "stopped_loaded", "low_engagement"), 4),
+            "id": "belt_work",
+            "title": "Less than half of people's time went into working the belt",
+            "what": f"{float(belt_work.sum() / present.sum()):.0%} of person-time was spent working the belt (picking, dropping, returning), "
+                    f"{float(off_belt.sum() / present.sum()):.0%} active away from it and {float(waiting.sum() / present.sum()):.0%} waiting. "
+                    f"While the belt flowed, {float(belt_work[state == 'flowing'].mean()):.1f} of {float(present[state == 'flowing'].mean()):.1f} people were on it.",
+            "why": f"Belt work falls from {share_of(belt_work, 'flowing'):.0%} when the belt flows to {share_of(belt_work, 'stopped_empty'):.0%} when it is stopped and empty, "
+                   f"and waiting rises from {wait_share['flowing']:.0%} to {wait_share['stopped_empty']:.0%}. People follow the belt, which points at the process, not the people. "
+                   f"For {low_secs / n:.0%} of the session three or more people were present with at most one working the belt.",
+            "action": "Fix stops and gaps first. Then look at the activity away from the belt: some is stacking and staging, some is not work, "
+                      "and this camera cannot yet tell them apart.",
+            "metric": {"label": "Time working the belt", "value": f"{float(belt_work.sum() / present.sum()):.0%}"},
+            "evidence": evidence(("low_engagement",), 4),
         },
     ]
     rel = [e for e in ev if e["type"] == "release_window"]
@@ -111,7 +115,7 @@ def build(con):
         "what": f"{len(rel)} windows where the belt was idle and about two people were waiting, lasting "
                 f"{min((e['duration'] for e in rel), default=0)}-{max((e['duration'] for e in rel), default=0)} seconds "
                 f"({sum(e['wait_person_sec'] for e in rel) / 60:.1f} person-minutes). "
-                f"{len(prs)} window where this bay was saturated with everyone busy.",
+                f"{len(prs)} window{'s' if len(prs) != 1 else ''} where this bay was saturated with nobody waiting.",
         "why": f"The first six minutes had {float(present[early].mean()):.1f} people and the belt flowing {float((state[early] == 'flowing').mean()):.0%} of the time; "
                f"the rest had {float(present[late].mean()):.1f} people and {float((state[late] == 'flowing').mean()):.0%}. "
                "Fewer people moved more freight, so the bigger win is the staffing level per phase, not second-by-second moves.",
