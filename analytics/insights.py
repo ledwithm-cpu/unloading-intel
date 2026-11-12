@@ -11,7 +11,7 @@ import numpy as np
 
 LABEL = {"flowing": "Flowing", "running_empty": "Running near-empty", "stopped_loaded": "Stopped with freight",
          "stopped_empty": "Stopped and empty", "release_window": "People free to release",
-         "under_pressure": "Bay under pressure", "low_engagement": "3+ present, at most 1 on the belt"}
+         "under_pressure": "Bay under pressure", "low_engagement": "3+ present, at most 1 unloading"}
 
 
 def mmss(s):
@@ -94,15 +94,15 @@ def build(con):
         {
             "id": "belt_work",
             "title": f"{float(belt_work.sum() / present.sum()):.0%} of people's time went into working the belt",
-            "what": f"{float(belt_work.sum() / present.sum()):.0%} of person-time was spent working the belt (picking, dropping, returning), "
-                    f"{float(off_belt.sum() / present.sum()):.0%} active away from it and {float(waiting.sum() / present.sum()):.0%} waiting. "
-                    f"While the belt flowed, {float(belt_work[state == 'flowing'].mean()):.1f} of {float(present[state == 'flowing'].mean()):.1f} people were on it.",
-            "why": f"Belt work falls from {share_of(belt_work, 'flowing'):.0%} when the belt flows to {share_of(belt_work, 'stopped_empty'):.0%} when it is stopped and empty, "
+            "what": f"{float(belt_work.sum() / present.sum()):.0%} of person-time was spent unloading (picking from the belt, carrying, returning), "
+                    f"{float(off_belt.sum() / present.sum()):.0%} on other activity and {float(waiting.sum() / present.sum()):.0%} waiting. "
+                    f"While the belt flowed, {float(belt_work[state == 'flowing'].mean()):.1f} of {float(present[state == 'flowing'].mean()):.1f} people were unloading.",
+            "why": f"Unloading falls from {share_of(belt_work, 'flowing'):.0%} when the belt flows to {share_of(belt_work, 'stopped_empty'):.0%} when it is stopped and empty, "
                    f"and waiting rises from {wait_share['flowing']:.0%} to {wait_share['stopped_empty']:.0%}. People follow the belt, which points at the process, not the people. "
-                   f"For {low_secs / n:.0%} of the session three or more people were present with at most one working the belt.",
-            "action": "Fix stops and gaps first. Then look at the activity away from the belt: some is stacking and staging, some is not work, "
+                   f"For {low_secs / n:.0%} of the session three or more people were present with at most one unloading.",
+            "action": "Fix stops and gaps first. Then look at the other activity: some is stacking and staging, some is not work, "
                       "and this camera cannot yet tell them apart.",
-            "metric": {"label": "Time working the belt", "value": f"{float(belt_work.sum() / present.sum()):.0%}"},
+            "metric": {"label": "Time unloading", "value": f"{float(belt_work.sum() / present.sum()):.0%}"},
             "evidence": evidence(("low_engagement",), 4),
         },
     ]

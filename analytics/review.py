@@ -51,7 +51,7 @@ def main():
             canvas = cv2.copyMakeBorder(im, 40, 0, 0, 0, cv2.BORDER_CONSTANT, value=(30, 30, 30))
             cv2.putText(canvas, f"Moment {n}/{len(moments)}   video {s // 60}:{s % 60:02d}   Belt: {NICE[state]}",
                         (12, 27), 0, 0.7, (255, 255, 255), 2, cv2.LINE_AA)
-            cv2.putText(canvas, "green = working the belt   orange = active off belt   red = waiting", (720, 27), 0, 0.55,
+            cv2.putText(canvas, "green = unloading   orange = other activity   red = waiting", (720, 27), 0, 0.55,
                         (200, 200, 200), 1, cv2.LINE_AA)
             vw.write(canvas)
     vw.release()

@@ -159,15 +159,15 @@
     "belt_reach": {
       "label": "Belt reach (hands)",
       "kind": "reach",
-      "note": "Where a hand counts as at the belt. Wider than the belt on the pile side: hands held above the belt surface appear higher in the image from this camera angle.",
+      "note": "Where a hand counts as at the belt. Wider than the belt on the pile side: hands held above the belt surface appear higher in the image from this camera angle. Also extends past the far end, where people take freight off the end of the belt.",
       "polygon": [
         [
-          195,
-          165
+          165,
+          152
         ],
         [
-          272,
-          60
+          242,
+          47
         ],
         [
           1265,

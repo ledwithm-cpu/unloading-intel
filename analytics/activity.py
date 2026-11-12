@@ -66,7 +66,9 @@ def run(con, zones_path="config/zones.json", rules_path="config/rules.json"):
         j = min(max(bisect.bisect_left(belt_t, t_sec), 0), len(belt_t) - 1)
         sx = cv2.perspectiveTransform(np.float32([[[x, y]]]), H)[0, 0, 0]
         b = int(np.clip(sx / STRIP_W * N_BINS, 0, N_BINS - 1))
-        lo, hi = max(0, b - rules["freight_reach_bins"]), min(N_BINS, b + rules["freight_reach_bins"] + 1)
+        # look further upstream (towards the dock door): that is the freight about to arrive at the hand,
+        # and at the far end the last stretch of belt is hidden behind the people standing there
+        lo, hi = max(0, b - rules["freight_reach_bins_upstream"]), min(N_BINS, b + rules["freight_reach_bins"] + 1)
         return max(max(belt_bins[k][lo:hi]) for k in range(max(0, j - 2), min(len(belt_t), j + 3)))
 
     rows = con.execute(
@@ -121,13 +123,23 @@ def run(con, zones_path="config/zones.json", rules_path="config/rules.json"):
         # Someone is "working the belt" for a few seconds either side of each touch: the pick, the turn to
         # drop, and the return. Movement with no touch nearby is activity away from the belt.
         touch_t = t[at_freight & (np.maximum(wrist_s, body_s) >= rules["touch_min_speed"])]
-        for i, r in enumerate(recs):
+        states, last_touch = [], None
+        for i in range(len(recs)):
+            moving = max(wrist_s[i], body_s[i]) >= rules["active_speed"]
             if len(touch_t) and np.abs(touch_t - t[i]).min() <= rules["cycle_window_seconds"]:
                 state = "belt_work"
-            elif max(wrist_s[i], body_s[i]) >= rules["active_speed"]:
+                past = touch_t[touch_t <= t[i]]
+                last_touch = past.max() if len(past) else last_touch
+            elif (states and states[-1] == "belt_work" and moving and t[i] - t[i - 1] <= 0.45
+                  and last_touch is not None and t[i] - last_touch <= rules["carry_max_seconds"]):
+                state = "belt_work"          # still carrying what they picked: the cycle runs until they stop
+            elif moving:
                 state = "off_belt"
             else:
                 state = "waiting"
+            states.append(state)
+        for i, r in enumerate(recs):
+            state = states[i]
             zone = zone_of((float(ref[i, 0]), float(ref[i, 1])), polys, priority)
             out.append((r[0], r[1], tid, zone, int(on_belt[i]), round(float(wrist_s[i]), 3),
                         round(float(body_s[i]), 3), state))

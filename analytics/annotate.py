@@ -32,7 +32,7 @@ def draw(con, cap, t_sec, zones=None, label=True):
                 cv2.line(im, (int(kp[a][0]), int(kp[a][1])), (int(kp[b][0]), int(kp[b][1])), c, 2)
         cv2.rectangle(im, (int(x1), int(y1)), (int(x2), int(y2)), c, 2)
         if label:
-            txt = {"belt_work": "on belt", "off_belt": "off belt", "waiting": "waiting"}[state]
+            txt = {"belt_work": "unloading", "off_belt": "other", "waiting": "waiting"}[state]
             cv2.rectangle(im, (int(x1), int(y1) - 16), (int(x1) + 9 * len(txt), int(y1)), c, -1)
             cv2.putText(im, txt, (int(x1) + 2, int(y1) - 4), 0, 0.45, (255, 255, 255), 1, cv2.LINE_AA)
     return im
