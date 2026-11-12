@@ -80,35 +80,35 @@
    "why": "Headcount was highest during the gaps (5.4 people against 4.6 when flowing). Workers along the belt mainly take freight off it to sort, so an empty belt means the truck end is not feeding fast enough for the people waiting to sort.",
    "action": "Look at the truck end first: one more person unloading, or fewer sorters during slow feed, would close the gap. A camera inside the dock door would confirm it.",
    "metric": {
-    "label": "Running empty",
+    "label": "Running near-empty",
     "value": "14%"
    },
    "evidence": [
     {
      "event_id": 2,
      "t_sec": 86,
-     "label": "1:26 \u00b7 Running empty for 46s",
+     "label": "1:26 \u00b7 Running near-empty for 46s",
      "people_present": 5.37,
      "people_waiting": 1.6
     },
     {
      "event_id": 10,
      "t_sec": 270,
-     "label": "4:30 \u00b7 Running empty for 35s",
+     "label": "4:30 \u00b7 Running near-empty for 35s",
      "people_present": 7.19,
      "people_waiting": 1.42
     },
     {
      "event_id": 11,
      "t_sec": 310,
-     "label": "5:10 \u00b7 Running empty for 59s",
+     "label": "5:10 \u00b7 Running near-empty for 59s",
      "people_present": 6.15,
      "people_waiting": 0.53
     },
     {
      "event_id": 20,
      "t_sec": 1114,
-     "label": "18:34 \u00b7 Running empty for 21s",
+     "label": "18:34 \u00b7 Running near-empty for 21s",
      "people_present": 3.64,
      "people_waiting": 0.62
     }

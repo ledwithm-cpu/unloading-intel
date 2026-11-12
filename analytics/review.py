@@ -12,7 +12,7 @@ import cv2
 
 from . import annotate
 
-NICE = {"flowing": "FLOWING", "running_empty": "RUNNING EMPTY", "stopped_loaded": "STOPPED WITH FREIGHT",
+NICE = {"flowing": "FLOWING", "running_empty": "RUNNING NEAR-EMPTY", "stopped_loaded": "STOPPED WITH FREIGHT",
         "stopped_empty": "STOPPED AND EMPTY"}
 
 

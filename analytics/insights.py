@@ -9,7 +9,7 @@ import sqlite3
 
 import numpy as np
 
-LABEL = {"flowing": "Flowing", "running_empty": "Running empty", "stopped_loaded": "Stopped with freight",
+LABEL = {"flowing": "Flowing", "running_empty": "Running near-empty", "stopped_loaded": "Stopped with freight",
          "stopped_empty": "Stopped and empty", "release_window": "People free to release",
          "under_pressure": "Bay under pressure", "low_engagement": "Few people working"}
 
@@ -76,7 +76,7 @@ def build(con):
                    f"{float(present[state == 'flowing'].mean()):.1f} when flowing). Workers along the belt mainly take freight off it to sort, "
                    "so an empty belt means the truck end is not feeding fast enough for the people waiting to sort.",
             "action": "Look at the truck end first: one more person unloading, or fewer sorters during slow feed, would close the gap. A camera inside the dock door would confirm it.",
-            "metric": {"label": "Running empty", "value": f"{share['running_empty']:.0%}"},
+            "metric": {"label": "Running near-empty", "value": f"{share['running_empty']:.0%}"},
             "evidence": evidence(("running_empty",)),
         },
         {

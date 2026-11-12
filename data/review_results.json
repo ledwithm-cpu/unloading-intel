@@ -1,0 +1,20 @@
+{
+  "reviewer": "Michael Ledwith",
+  "date": "2026-11-12",
+  "method": "20 five-second moments, 5 per belt state, picked at random (seed 7). Reviewer watched data/review_reel.mp4 with the system's labels drawn on and marked anything wrong.",
+  "belt_state": {"moments": 20, "wrong": 0, "note": "Moments 2 and 19 were labelled 'running empty' with one or two parcels on the belt. State renamed to 'running near-empty' (under 20% of the surface covered)."},
+  "worker_activity": {
+    "person_clips": 100,
+    "wrong": 6,
+    "agreement": 0.94,
+    "errors": [
+      {"moment": 2, "note": "one person at the far end shown working, was not"},
+      {"moment": 5, "note": "person at far left shown working, was not"},
+      {"moment": 12, "note": "three people shown working, none were (one seated)"},
+      {"moment": 15, "note": "person at the far end shown working, was not"}
+    ],
+    "direction": "All six errors are waiting people counted as working. Reported waiting time is therefore a floor.",
+    "tuning_tried": "Raising the motion threshold fixed 4 of the 6 but flipped 4 labels the reviewer had accepted; hand reach and torso lean did not separate the cases either. Threshold left at 0.12.",
+    "caveats": "A reviewer flags what stands out, so 94% is an upper bound. 20 moments is a small sample."
+  }
+}
