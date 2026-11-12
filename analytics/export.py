@@ -68,9 +68,10 @@ def main():
               open(f"{a.out}/frames.json", "w"), separators=(",", ":"))
     import os
     import subprocess
-    if os.path.exists("data/source.mp4"):       # still picture for the zone editor
-        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "1695", "-i", "data/source.mp4", "-frames:v", "1", "-q:v", "4",
-                        f"{a.out}/frame.jpg"], check=False)
+    blurred = "app/public/video/unloading.mp4"      # take the zone-editor still from the face-blurred copy
+    if os.path.exists(blurred):
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-ss", "1695", "-i", blurred, "-frames:v", "1", "-vf", "scale=1280:720",
+                        "-q:v", "4", f"{a.out}/frame.jpg"], check=False)
     print("session.json and frames.json written:", len(tl), "seconds,", n, "overlay frames")
 
 
