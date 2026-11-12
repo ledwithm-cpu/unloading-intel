@@ -18,5 +18,17 @@
     "low_engagement_min_present": 3,
     "low_engagement_max_handling": 1.0,
     "low_engagement_min_seconds": 10
+  },
+  "reallocation": {
+    "smooth_seconds": 10,
+    "release_min_waiting": 1.5,
+    "release_min_seconds": 20,
+    "release_belt_states": [
+      "running_empty",
+      "stopped_empty"
+    ],
+    "pressure_min_occupancy": 0.75,
+    "pressure_max_waiting": 0.5,
+    "pressure_min_seconds": 20
   }
 }

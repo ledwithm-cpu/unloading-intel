@@ -5,6 +5,8 @@ Event types
   stopped_loaded  belt stopped with freight on it (blockage / manual stop)
   stopped_empty   belt stopped and bare (full idle)
   low_engagement  several people present, at most one working
+  release_window  belt idle and people waiting long enough that they could help another bay
+  under_pressure  belt saturated or blocked with everyone busy: this bay could use help
 """
 import json
 
@@ -68,6 +70,21 @@ def run(con, rules_path="config/rules.json"):
     flags = [r[3] >= rules["low_engagement_min_present"] and r[4] <= rules["low_engagement_max_handling"] for r in tl]
     for a, b in _segments(flags, rules["low_engagement_min_seconds"], rules["bridge_gap_seconds"]):
         events.append(summarise("low_engagement", a, b))
+
+    # --- reallocation signals: the two halves of a cross-bay alert ---
+    ra = json.load(open(rules_path))["reallocation"]
+    k = ra["smooth_seconds"]
+    def smooth(col):
+        v = [r[col] for r in tl]
+        return [sum(v[max(0, i - k // 2):i + k // 2 + 1]) / len(v[max(0, i - k // 2):i + k // 2 + 1]) for i in range(len(v))]
+    wait_s, occ_s = smooth(5), smooth(2)
+    flags = [tl[i][1] in ra["release_belt_states"] and wait_s[i] >= ra["release_min_waiting"] for i in range(len(tl))]
+    for a, b in _segments(flags, ra["release_min_seconds"], rules["bridge_gap_seconds"]):
+        events.append(summarise("release_window", a, b))
+    flags = [(occ_s[i] >= ra["pressure_min_occupancy"] or tl[i][1] == "stopped_loaded") and wait_s[i] <= ra["pressure_max_waiting"]
+             for i in range(len(tl))]
+    for a, b in _segments(flags, ra["pressure_min_seconds"], rules["bridge_gap_seconds"]):
+        events.append(summarise("under_pressure", a, b))
 
     events.sort(key=lambda e: e[1])
     con.executescript(SCHEMA)

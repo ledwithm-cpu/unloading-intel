@@ -10,7 +10,8 @@ import sqlite3
 import numpy as np
 
 LABEL = {"flowing": "Flowing", "running_empty": "Running empty", "stopped_loaded": "Stopped with freight",
-         "stopped_empty": "Stopped and empty"}
+         "stopped_empty": "Stopped and empty", "release_window": "People free to release",
+         "under_pressure": "Bay under pressure", "low_engagement": "Few people working"}
 
 
 def mmss(s):
@@ -101,6 +102,24 @@ def build(con):
             "evidence": evidence(("stopped_empty", "stopped_loaded", "low_engagement"), 4),
         },
     ]
+    rel = [e for e in ev if e["type"] == "release_window"]
+    prs = [e for e in ev if e["type"] == "under_pressure"]
+    late = ~early
+    cards.append({
+        "id": "reallocation",
+        "title": "People could have been released to another bay, in short windows",
+        "what": f"{len(rel)} windows where the belt was idle and about two people were waiting, lasting "
+                f"{min((e['duration'] for e in rel), default=0)}-{max((e['duration'] for e in rel), default=0)} seconds "
+                f"({sum(e['wait_person_sec'] for e in rel) / 60:.1f} person-minutes). "
+                f"{len(prs)} window where this bay was saturated with everyone busy.",
+        "why": f"The first six minutes had {float(present[early].mean()):.1f} people and the belt flowing {float((state[early] == 'flowing').mean()):.0%} of the time; "
+               f"the rest had {float(present[late].mean()):.1f} people and {float((state[late] == 'flowing').mean()):.0%}. "
+               "Fewer people moved more freight, so the bigger win is the staffing level per phase, not second-by-second moves.",
+        "action": "With every bay on the same measure, match each bay's release windows against other bays' pressure windows and alert a supervisor "
+                  "when a move is worth the walk. On this evidence, start by releasing one person during slow feed from the truck.",
+        "metric": {"label": "Release windows", "value": str(len(rel))},
+        "evidence": evidence(("release_window", "under_pressure"), 4),
+    })
     return {"headline": headline, "cards": cards, "events": ev}
 
 
