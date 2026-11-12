@@ -1,0 +1,166 @@
+{
+  "frame_size": [
+    1280,
+    720
+  ],
+  "note": "Polygons are [x, y] pixel points on the 1280x720 source frame. Edit here or in the app's zone editor; analytics re-run without reprocessing video.",
+  "zones": {
+    "belt": {
+      "label": "Conveyor belt",
+      "kind": "belt",
+      "polygon": [
+        [
+          203,
+          150
+        ],
+        [
+          262,
+          97
+        ],
+        [
+          1249,
+          522
+        ],
+        [
+          1227,
+          606
+        ]
+      ],
+      "flow_axis": "polygon[1] -> polygon[0] is the far (discharge) end; polygon[2] -> polygon[3] is the dock-door (infeed) end"
+    },
+    "far_end": {
+      "label": "Far end",
+      "kind": "work",
+      "polygon": [
+        [
+          70,
+          30
+        ],
+        [
+          270,
+          0
+        ],
+        [
+          262,
+          97
+        ],
+        [
+          203,
+          150
+        ],
+        [
+          215,
+          240
+        ],
+        [
+          85,
+          240
+        ]
+      ]
+    },
+    "pile_side": {
+      "label": "Pile side",
+      "kind": "work",
+      "polygon": [
+        [
+          270,
+          0
+        ],
+        [
+          262,
+          97
+        ],
+        [
+          1249,
+          522
+        ],
+        [
+          1280,
+          480
+        ],
+        [
+          1280,
+          120
+        ],
+        [
+          900,
+          0
+        ]
+      ]
+    },
+    "floor_side": {
+      "label": "Floor side",
+      "kind": "work",
+      "polygon": [
+        [
+          85,
+          240
+        ],
+        [
+          215,
+          240
+        ],
+        [
+          203,
+          150
+        ],
+        [
+          1000,
+          505
+        ],
+        [
+          960,
+          660
+        ],
+        [
+          540,
+          500
+        ],
+        [
+          300,
+          440
+        ],
+        [
+          85,
+          340
+        ]
+      ]
+    },
+    "dock_door": {
+      "label": "Dock door",
+      "kind": "work",
+      "polygon": [
+        [
+          1000,
+          505
+        ],
+        [
+          1227,
+          606
+        ],
+        [
+          1280,
+          560
+        ],
+        [
+          1280,
+          720
+        ],
+        [
+          960,
+          720
+        ],
+        [
+          960,
+          660
+        ]
+      ]
+    }
+  },
+  "zone_priority": [
+    "dock_door",
+    "far_end",
+    "pile_side",
+    "floor_side"
+  ]
+}

@@ -1,0 +1,113 @@
+"""Turn raw detections into per-person activity: which zone, and handling / moving / waiting.
+
+Reads `detections`, writes `person_activity`. No video needed.
+All thresholds live in config/rules.json so they can be tuned and defended in one place.
+"""
+import json
+from collections import defaultdict
+
+import cv2
+import numpy as np
+
+L_WRIST, R_WRIST, L_HIP, R_HIP = 9, 10, 11, 12
+
+SCHEMA = """
+DROP TABLE IF EXISTS person_activity;
+CREATE TABLE person_activity (
+    frame_idx INTEGER, t_sec REAL, track_id INTEGER,
+    zone TEXT,                -- dock_door / far_end / pile_side / floor_side / away
+    hands_on_belt INTEGER,    -- 1 if a wrist is over the belt zone
+    wrist_speed REAL,         -- body-heights per second
+    body_speed REAL,          -- body-heights per second
+    state TEXT                -- handling / moving / waiting
+);
+CREATE INDEX idx_pa_t ON person_activity (t_sec);
+"""
+
+
+def load_zones(path):
+    z = json.load(open(path))
+    polys = {k: np.array(v["polygon"], np.float32) for k, v in z["zones"].items()}
+    return polys, z["zone_priority"]
+
+
+def zone_of(pt, polys, priority):
+    for name in priority:
+        if cv2.pointPolygonTest(polys[name], pt, False) >= 0:
+            return name
+    belt = polys["belt"]
+    if cv2.pointPolygonTest(belt, pt, False) >= 0:
+        # leaning over the belt: assign to the side of the centreline they are on
+        far_lo, far_up, near_up, near_lo = belt
+        a, b = (near_up + near_lo) / 2, (far_up + far_lo) / 2
+        side = (b[0] - a[0]) * (pt[1] - a[1]) - (b[1] - a[1]) * (pt[0] - a[0])
+        return "floor_side" if side < 0 else "pile_side"
+    return "away"
+
+
+def run(con, zones_path="config/zones.json", rules_path="config/rules.json"):
+    rules = json.load(open(rules_path))["activity"]
+    polys, priority = load_zones(zones_path)
+    belt = polys["belt"]
+
+    rows = con.execute(
+        "SELECT frame_idx, t_sec, track_id, x1, y1, x2, y2, conf, keypoints FROM detections "
+        "WHERE track_id IS NOT NULL ORDER BY track_id, frame_idx").fetchall()
+    tracks = defaultdict(list)
+    for r in rows:
+        tracks[r[2]].append(r)
+
+    out, dropped = [], []
+    for tid, recs in tracks.items():
+        kp = np.array([json.loads(r[8]) for r in recs], np.float32)       # T x 17 x 3
+        t = np.array([r[1] for r in recs])
+        box = np.array([r[3:7] for r in recs], np.float32)
+        conf = np.array([r[7] for r in recs])
+        centre = (box[:, :2] + box[:, 2:]) / 2
+        # a "person" that never moves and is never confidently a person is freight (e.g. a printed sack)
+        if len(recs) > 50 and conf.mean() < rules["ghost_max_conf"] and centre.std(0).max() < rules["ghost_max_std_px"]:
+            dropped.append(tid)
+            continue
+        hips_ok = (kp[:, [L_HIP, R_HIP], 2] > 0.3).all(1)
+        ref = np.where(hips_ok[:, None], kp[:, [L_HIP, R_HIP], :2].mean(1), centre)
+        bh = np.maximum(box[:, 3] - box[:, 1], 60.0)
+
+        wr = kp[:, [L_WRIST, R_WRIST], :]
+        on_belt = np.zeros(len(recs), bool)
+        for i in range(len(recs)):
+            for w in wr[i]:
+                if w[2] > 0.3 and cv2.pointPolygonTest(belt, (float(w[0]), float(w[1])), True) >= -rules["belt_reach_px"]:
+                    on_belt[i] = True
+
+        dt = np.diff(t, prepend=t[0])
+        ok = (dt > 0) & (dt <= 0.45)
+        body = np.zeros(len(recs)); wrist = np.zeros(len(recs))
+        d_ref = np.linalg.norm(np.diff(ref, axis=0, prepend=ref[:1]), axis=1)
+        body[ok] = d_ref[ok] / dt[ok] / bh[ok]
+        d_w = np.linalg.norm(np.diff(wr[:, :, :2], axis=0, prepend=wr[:1, :, :2]), axis=2)       # T x 2
+        vis = (wr[:, :, 2] > 0.3) & (np.roll(wr[:, :, 2], 1, axis=0) > 0.3)
+        d_w = np.where(vis, d_w, 0).max(1)
+        wrist[ok] = d_w[ok] / dt[ok] / bh[ok]
+
+        k = rules["smooth_samples"]
+        def roll(a, f):
+            return np.array([f(a[max(0, i - k):i + k + 1]) for i in range(len(a))])
+        wrist_s, body_s, belt_s = roll(wrist, np.median), roll(body, np.median), roll(on_belt.astype(float), np.mean)
+
+        for i, r in enumerate(recs):
+            # one question first: is this person moving at all? then: hands working, or walking?
+            if max(wrist_s[i], body_s[i]) < rules["active_speed"]:
+                state = "waiting"
+            elif belt_s[i] >= 0.3 or wrist_s[i] >= rules["hands_vs_body_ratio"] * body_s[i]:
+                state = "handling"
+            else:
+                state = "moving"
+            zone = zone_of((float(ref[i, 0]), float(ref[i, 1])), polys, priority)
+            out.append((r[0], r[1], tid, zone, int(on_belt[i]), round(float(wrist_s[i]), 3),
+                        round(float(body_s[i]), 3), state))
+
+    con.executescript(SCHEMA)
+    con.executemany("INSERT INTO person_activity VALUES (?,?,?,?,?,?,?,?)", out)
+    con.execute("INSERT OR REPLACE INTO video_meta VALUES ('ghost_tracks_dropped', ?)", (json.dumps(dropped),))
+    con.commit()
+    return len(out), dropped

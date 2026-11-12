@@ -1,0 +1,22 @@
+{
+  "activity": {
+    "ghost_max_conf": 0.5,
+    "ghost_max_std_px": 6,
+    "belt_reach_px": 12,
+    "smooth_samples": 5,
+    "active_speed": 0.12,
+    "hands_vs_body_ratio": 1.5
+  },
+  "belt": {
+    "smooth_samples": 4,
+    "moving_min_speed": 0.01,
+    "loaded_min_occupancy": 0.2
+  },
+  "events": {
+    "belt_min_seconds": 10,
+    "bridge_gap_seconds": 2,
+    "low_engagement_min_present": 3,
+    "low_engagement_max_handling": 1.0,
+    "low_engagement_min_seconds": 10
+  }
+}

@@ -1,0 +1,450 @@
+{
+ "headline": {
+  "video_seconds": 1713,
+  "belt_state_share": {
+   "flowing": 0.6187974314068885,
+   "running_empty": 0.13952130764740223,
+   "stopped_loaded": 0.15586690017513136,
+   "stopped_empty": 0.08581436077057793
+  },
+  "belt_state_seconds": {
+   "flowing": 1060,
+   "running_empty": 239,
+   "stopped_loaded": 267,
+   "stopped_empty": 147
+  },
+  "productive_share": 0.6187974314068885,
+  "lost_seconds": 653,
+  "avg_people": 4.646117921774665,
+  "person_minutes": {
+   "present": 132.64666666666668,
+   "working": 87.1,
+   "waiting": 29.94
+  },
+  "throughput_vs_best_minute": 0.4587133575520211,
+  "best_minute_start_sec": 1336,
+  "sentence": "The belt moved freight 62% of the time. The other 11 minutes of 29 were lost to stops and gaps."
+ },
+ "cards": [
+  {
+   "id": "stops",
+   "title": "The belt was stopped for a quarter of the session",
+   "what": "12 stops of 10 seconds or more, 6.9 minutes in total. 4.5 of those minutes had freight sitting on the belt.",
+   "why": "While the belt was stopped, 35% of the people in view were waiting, against 19% while it flowed. A stop holds up everyone downstream of it.",
+   "action": "Find out what triggers each stop. The clips show awkward items (wire cages, long rolls) being handled on the belt during several of them; routing those off-belt is the first thing to test.",
+   "metric": {
+    "label": "Belt stopped",
+    "value": "24%"
+   },
+   "evidence": [
+    {
+     "event_id": 11,
+     "t_sec": 539,
+     "label": "8:59 \u00b7 Stopped and empty for 33s",
+     "people_present": 5.04,
+     "people_waiting": 1.62
+    },
+    {
+     "event_id": 12,
+     "t_sec": 572,
+     "label": "9:32 \u00b7 Stopped with freight for 66s",
+     "people_present": 4.81,
+     "people_waiting": 2.14
+    },
+    {
+     "event_id": 18,
+     "t_sec": 1135,
+     "label": "18:55 \u00b7 Stopped and empty for 61s",
+     "people_present": 3.96,
+     "people_waiting": 1.83
+    },
+    {
+     "event_id": 21,
+     "t_sec": 1551,
+     "label": "25:51 \u00b7 Stopped with freight for 43s",
+     "people_present": 2.88,
+     "people_waiting": 0.68
+    }
+   ]
+  },
+  {
+   "id": "gaps",
+   "title": "The sorting team outran the supply from the truck",
+   "what": "8 gaps of 10 seconds or more, 4.0 minutes in total, most of them in the first six minutes (belt flowing only 39% of that time).",
+   "why": "Headcount was highest during the gaps (5.4 people against 4.6 when flowing). Workers along the belt mainly take freight off it to sort, so an empty belt means the truck end is not feeding fast enough for the people waiting to sort.",
+   "action": "Look at the truck end first: one more person unloading, or fewer sorters during slow feed, would close the gap. A camera inside the dock door would confirm it.",
+   "metric": {
+    "label": "Running empty",
+    "value": "14%"
+   },
+   "evidence": [
+    {
+     "event_id": 1,
+     "t_sec": 86,
+     "label": "1:26 \u00b7 Running empty for 46s",
+     "people_present": 5.37,
+     "people_waiting": 1.6
+    },
+    {
+     "event_id": 7,
+     "t_sec": 270,
+     "label": "4:30 \u00b7 Running empty for 35s",
+     "people_present": 7.19,
+     "people_waiting": 1.42
+    },
+    {
+     "event_id": 8,
+     "t_sec": 310,
+     "label": "5:10 \u00b7 Running empty for 59s",
+     "people_present": 6.15,
+     "people_waiting": 0.53
+    },
+    {
+     "event_id": 17,
+     "t_sec": 1114,
+     "label": "18:34 \u00b7 Running empty for 21s",
+     "people_present": 3.64,
+     "people_waiting": 0.62
+    }
+   ]
+  },
+  {
+   "id": "capacity",
+   "title": "On average the line ran at less than half its own best minute",
+   "what": "Freight flow averaged 46% of the best sustained minute (from 22:16). Even while flowing, 41% of the belt surface was bare.",
+   "why": "The same people and the same belt have already shown the higher rate. The gap is steadiness, not speed.",
+   "action": "Use the best minute as the target rate and track minutes at or near it per session.",
+   "metric": {
+    "label": "Of best-minute rate",
+    "value": "46%"
+   },
+   "evidence": [
+    {
+     "t_sec": 1336,
+     "label": "22:16 \u00b7 best sustained minute"
+    },
+    {
+     "event_id": 11,
+     "t_sec": 539,
+     "label": "8:59 \u00b7 Stopped and empty for 33s",
+     "people_present": 5.04,
+     "people_waiting": 1.62
+    },
+    {
+     "event_id": 18,
+     "t_sec": 1135,
+     "label": "18:55 \u00b7 Stopped and empty for 61s",
+     "people_present": 3.96,
+     "people_waiting": 1.83
+    }
+   ]
+  },
+  {
+   "id": "waiting",
+   "title": "About a fifth of paid time on the floor was spent waiting",
+   "what": "30 of 133 person-minutes in view were waiting (23%). 15 of those fell while the belt was stopped or empty.",
+   "why": "Waiting rises from 19% when the belt flows to 38% when it is stopped and empty. The waiting follows the belt, which points at the process, not the people.",
+   "action": "Fix stops and gaps first. If waiting stays high at one position after that, rebalance who stands where.",
+   "metric": {
+    "label": "Time waiting",
+    "value": "23%"
+   },
+   "evidence": [
+    {
+     "event_id": 11,
+     "t_sec": 539,
+     "label": "8:59 \u00b7 Stopped and empty for 33s",
+     "people_present": 5.04,
+     "people_waiting": 1.62
+    },
+    {
+     "event_id": 12,
+     "t_sec": 572,
+     "label": "9:32 \u00b7 Stopped with freight for 66s",
+     "people_present": 4.81,
+     "people_waiting": 2.14
+    },
+    {
+     "event_id": 18,
+     "t_sec": 1135,
+     "label": "18:55 \u00b7 Stopped and empty for 61s",
+     "people_present": 3.96,
+     "people_waiting": 1.83
+    },
+    {
+     "event_id": 21,
+     "t_sec": 1551,
+     "label": "25:51 \u00b7 Stopped with freight for 43s",
+     "people_present": 2.88,
+     "people_waiting": 0.68
+    }
+   ]
+  }
+ ],
+ "events": [
+  {
+   "id": 1,
+   "type": "running_empty",
+   "start": 86,
+   "end": 132,
+   "duration": 46,
+   "present": 5.37,
+   "handling": 3.08,
+   "waiting": 1.6,
+   "wait_person_sec": 73.4,
+   "occupancy": 0.063
+  },
+  {
+   "id": 2,
+   "type": "running_empty",
+   "start": 140,
+   "end": 157,
+   "duration": 17,
+   "present": 5.73,
+   "handling": 3.46,
+   "waiting": 1.36,
+   "wait_person_sec": 23.2,
+   "occupancy": 0.073
+  },
+  {
+   "id": 3,
+   "type": "stopped_empty",
+   "start": 168,
+   "end": 178,
+   "duration": 10,
+   "present": 4.24,
+   "handling": 2.68,
+   "waiting": 1.4,
+   "wait_person_sec": 14.0,
+   "occupancy": 0.03
+  },
+  {
+   "id": 4,
+   "type": "running_empty",
+   "start": 175,
+   "end": 191,
+   "duration": 16,
+   "present": 3.9,
+   "handling": 2.31,
+   "waiting": 1.21,
+   "wait_person_sec": 19.4,
+   "occupancy": 0.07
+  },
+  {
+   "id": 5,
+   "type": "running_empty",
+   "start": 229,
+   "end": 244,
+   "duration": 15,
+   "present": 5.55,
+   "handling": 3.31,
+   "waiting": 1.64,
+   "wait_person_sec": 24.6,
+   "occupancy": 0.121
+  },
+  {
+   "id": 6,
+   "type": "stopped_empty",
+   "start": 250,
+   "end": 270,
+   "duration": 20,
+   "present": 5.62,
+   "handling": 1.98,
+   "waiting": 2.23,
+   "wait_person_sec": 44.6,
+   "occupancy": 0.036
+  },
+  {
+   "id": 7,
+   "type": "running_empty",
+   "start": 270,
+   "end": 305,
+   "duration": 35,
+   "present": 7.19,
+   "handling": 5.33,
+   "waiting": 1.42,
+   "wait_person_sec": 49.6,
+   "occupancy": 0.08
+  },
+  {
+   "id": 8,
+   "type": "running_empty",
+   "start": 310,
+   "end": 369,
+   "duration": 59,
+   "present": 6.15,
+   "handling": 4.8,
+   "waiting": 0.53,
+   "wait_person_sec": 31.4,
+   "occupancy": 0.112
+  },
+  {
+   "id": 9,
+   "type": "stopped_loaded",
+   "start": 442,
+   "end": 459,
+   "duration": 17,
+   "present": 4.71,
+   "handling": 2.64,
+   "waiting": 1.58,
+   "wait_person_sec": 26.8,
+   "occupancy": 0.942
+  },
+  {
+   "id": 10,
+   "type": "running_empty",
+   "start": 525,
+   "end": 539,
+   "duration": 14,
+   "present": 4.06,
+   "handling": 2.44,
+   "waiting": 0.94,
+   "wait_person_sec": 13.2,
+   "occupancy": 0.069
+  },
+  {
+   "id": 11,
+   "type": "stopped_empty",
+   "start": 539,
+   "end": 572,
+   "duration": 33,
+   "present": 5.04,
+   "handling": 2.34,
+   "waiting": 1.62,
+   "wait_person_sec": 53.6,
+   "occupancy": 0.1
+  },
+  {
+   "id": 12,
+   "type": "stopped_loaded",
+   "start": 572,
+   "end": 638,
+   "duration": 66,
+   "present": 4.81,
+   "handling": 2.12,
+   "waiting": 2.14,
+   "wait_person_sec": 141.2,
+   "occupancy": 0.307
+  },
+  {
+   "id": 13,
+   "type": "stopped_loaded",
+   "start": 746,
+   "end": 779,
+   "duration": 33,
+   "present": 4.68,
+   "handling": 1.84,
+   "waiting": 1.99,
+   "wait_person_sec": 65.6,
+   "occupancy": 0.457
+  },
+  {
+   "id": 14,
+   "type": "low_engagement",
+   "start": 762,
+   "end": 772,
+   "duration": 10,
+   "present": 5.1,
+   "handling": 0.48,
+   "waiting": 3.08,
+   "wait_person_sec": 30.8,
+   "occupancy": 0.498
+  },
+  {
+   "id": 15,
+   "type": "stopped_loaded",
+   "start": 899,
+   "end": 931,
+   "duration": 32,
+   "present": 3.46,
+   "handling": 2.04,
+   "waiting": 0.86,
+   "wait_person_sec": 27.4,
+   "occupancy": 0.848
+  },
+  {
+   "id": 16,
+   "type": "stopped_loaded",
+   "start": 1009,
+   "end": 1023,
+   "duration": 14,
+   "present": 4.17,
+   "handling": 2.33,
+   "waiting": 1.13,
+   "wait_person_sec": 15.8,
+   "occupancy": 0.691
+  },
+  {
+   "id": 17,
+   "type": "running_empty",
+   "start": 1114,
+   "end": 1135,
+   "duration": 21,
+   "present": 3.64,
+   "handling": 1.83,
+   "waiting": 0.62,
+   "wait_person_sec": 13.0,
+   "occupancy": 0.098
+  },
+  {
+   "id": 18,
+   "type": "stopped_empty",
+   "start": 1135,
+   "end": 1196,
+   "duration": 61,
+   "present": 3.96,
+   "handling": 1.82,
+   "waiting": 1.83,
+   "wait_person_sec": 111.8,
+   "occupancy": 0.109
+  },
+  {
+   "id": 19,
+   "type": "low_engagement",
+   "start": 1174,
+   "end": 1186,
+   "duration": 12,
+   "present": 3.8,
+   "handling": 0.27,
+   "waiting": 2.98,
+   "wait_person_sec": 35.8,
+   "occupancy": 0.093
+  },
+  {
+   "id": 20,
+   "type": "stopped_loaded",
+   "start": 1196,
+   "end": 1216,
+   "duration": 20,
+   "present": 4.08,
+   "handling": 1.89,
+   "waiting": 1.85,
+   "wait_person_sec": 37.0,
+   "occupancy": 0.271
+  },
+  {
+   "id": 21,
+   "type": "stopped_loaded",
+   "start": 1551,
+   "end": 1594,
+   "duration": 43,
+   "present": 2.88,
+   "handling": 1.79,
+   "waiting": 0.68,
+   "wait_person_sec": 29.4,
+   "occupancy": 0.539
+  },
+  {
+   "id": 22,
+   "type": "stopped_empty",
+   "start": 1698,
+   "end": 1713,
+   "duration": 15,
+   "present": 2.57,
+   "handling": 1.53,
+   "waiting": 0.63,
+   "wait_person_sec": 9.4,
+   "occupancy": 0.09
+  }
+ ]
+}

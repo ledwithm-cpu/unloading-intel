@@ -1,0 +1,12 @@
+# Source footage and anything showing identifiable workers stays out of the repo
+data/source.mp4
+data/review_reel.mp4
+data/*.png
+# Model weights are downloaded by setup
+models/
+scratch/
+__pycache__/
+*.pyc
+node_modules/
+dist/
+.DS_Store

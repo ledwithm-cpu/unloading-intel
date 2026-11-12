@@ -1,0 +1,5 @@
+ultralytics>=8.4
+openvino>=2024.0
+opencv-python>=4.9
+numpy
+lap
