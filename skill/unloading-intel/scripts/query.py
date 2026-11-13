@@ -23,7 +23,7 @@ from pathlib import Path
 
 CLOCK_START = 6 * 3600 + 4 * 60 + 57            # camera clock at video 0:00
 BELT_LABEL = {"flowing": "moving freight", "running_empty": "running near-empty (under 20% covered)",
-              "stopped_loaded": "stopped with freight on it", "stopped_empty": "stopped and empty"}
+              "stopped_loaded": "stopped with freight on it", "stopped_empty": "stopped, near-empty (under 20% covered)"}
 
 
 def find_db():
@@ -107,7 +107,7 @@ def cmd_underutilised(con, a):
     idle.sort(key=len, reverse=True)
     w = 60
     best = min(range(len(tl) - w), key=lambda i: sum(r["occupancy"] for r in tl[i:i + w]))
-    out({"definition": "Belt running near-empty or stopped and empty for 10 s or more, longest first.",
+    out({"definition": "Belt running near-empty or stopped near-empty for 10 s or more, longest first.",
          "total_seconds": sum(len(s) for s in idle), "periods": [dict(describe(s), belt=BELT_LABEL[max(set(r['belt'] for r in s), key=[r['belt'] for r in s].count)]) for s in idle[:a.top]],
          "emptiest_minute": describe(tl[best:best + w])})
 

@@ -11,7 +11,7 @@ Built for the Protex AI Forward Deployed Engineer take-home, on the supplied 28.
 - **The belt was stopped for a quarter of the session**, 4.5 minutes of it with freight sitting on it.
 - **The sorting team outran the supply from the truck** in the first six minutes: most people in view, belt flowing 39% of the time.
 - **The line averaged 46% of its own best minute.** The same people and belt showed the higher rate; the gap is steadiness.
-- **Unloading follows the belt.** People unload about 74% of the time when it flows and 27% when it is stopped and empty.
+- **Unloading follows the belt.** People unload about 74% of the time when it flows and 27% when it is stopped and near-empty.
 - **Safety, from the same data:** seven candidate belt crossings, three while it was moving, and 52 periods of leaning on the belt.
 
 People figures are estimates; belt figures are the reliable ones. See [Accuracy](#accuracy).
@@ -166,6 +166,9 @@ stopped, far end vs pile side) held in every version; absolute levels should be 
 - **Why the belt stops is not measured.** The data shows what people were doing around each stop, not the cause.
 - **Tracking does not hold identities.** It produced 249 ids for about eight people, so nothing here follows one person across
   the session. Results are by position and working area, which is also the privacy-preserving choice (see above).
+- **Freight under people is not counted.** Belt surface covered by a person is ignored, so arms and bodies are not counted as
+  parcels. A parcel that people are standing over can then be missed: at 8:59 two people are examining a box at the far end and
+  the belt reads as stopped, near-empty. Found in review after the 20-moment sample.
 - **Belt crossings are candidates.** The rule also catches long reaches across the belt.
 - **Face blur covers detected people only.** Anyone the detector misses in a frame is not blurred in that frame.
 - **One session, one bay, one camera.** Nothing here generalises to the site without more footage.

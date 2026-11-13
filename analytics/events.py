@@ -3,7 +3,7 @@
 Event types
   running_empty   belt moving with almost nothing on it (supply gap)
   stopped_loaded  belt stopped with freight on it (blockage / manual stop)
-  stopped_empty   belt stopped and bare (full idle)
+  stopped_empty   belt stopped, under 20% covered
   low_engagement  several people present, at most one working the belt
   release_window  belt idle and people waiting long enough that they could help another bay
   under_pressure  belt saturated or blocked with everyone busy: this bay could use help

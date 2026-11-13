@@ -28,7 +28,7 @@ python skill/unloading-intel/scripts/query.py <command>
 | Command | Use it for |
 |---|---|
 | `summary` | Session overview: belt time by state, people by activity, reliability |
-| `underutilised [--top N]` | When the belt ran near-empty or sat stopped and empty; the emptiest minute |
+| `underutilised [--top N]` | When the belt ran near-empty or sat stopped near-empty; the emptiest minute |
 | `busiest [--window 60]` | The busiest period by freight flow, and how many people were unloading in it |
 | `find --present-min 3 --unloading-max 1 [--min-seconds 10]` | Periods matching a staffing pattern. Also `--present-max`, `--unloading-min`, `--waiting-min`, `--belt STATE` |
 | `people --from 9:30 --to 10:40` | Who was doing what in a time range, by working area |
@@ -49,7 +49,7 @@ python skill/unloading-intel/scripts/query.py <command>
 
 ## What the words mean
 
-- **Belt states.** Moving freight; running near-empty (under 20% of the surface covered, so one or two parcels still count); stopped with freight on it; stopped and empty.
+- **Belt states.** Moving freight; running near-empty (under 20% of the surface covered, so one or two parcels still count); stopped with freight on it; stopped, near-empty (same 20% rule). Freight that people are standing over is not seen.
 - **Unloading.** A hand at the belt next to freight while moving, plus the carry away from it or the fetch towards it. It includes loading onto the belt: the two are not told apart.
 - **Other activity.** Moving, with no belt contact. Some is real work (stacking, moving cages); some is not.
 - **Waiting.** Still. Includes leaning on the belt.

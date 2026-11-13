@@ -5,7 +5,8 @@
   "belt_state": {
     "moments": 20,
     "wrong": 0,
-    "note": "Moments 2 and 19 were labelled 'running empty' with one or two parcels on the belt. State renamed to 'running near-empty' (under 20% of the surface covered)."
+    "note": "Moments 2 and 19 were labelled 'running empty' with one or two parcels on the belt. State renamed to 'running near-empty' (under 20% of the surface covered).",
+    "found_after_sample": "At 8:59 the reviewer saw a box at the far end being examined by two people while the belt was labelled 'stopped and empty'. Cause: belt surface covered by a person is ignored, which hid the box. The state was renamed 'stopped, near-empty' to match its 20% rule, and the limit is now stated in the README."
   },
   "worker_activity": {
     "person_clips": 100,

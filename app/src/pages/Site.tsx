@@ -2,7 +2,7 @@ import type { Session } from "../types";
 import { BELT, pct } from "../lib";
 
 const EXAMPLE = [
-  { name: "Bay BN2", state: 3, people: 5, unloading: 1, note: "Belt stopped and empty for 70 seconds" },
+  { name: "Bay BN2", state: 3, people: 5, unloading: 1, note: "Belt stopped, near-empty, for 70 seconds" },
   { name: "Bay BN3", state: 0, people: 4, unloading: 4, note: "Flowing steadily" },
   { name: "Bay BN4", state: 2, people: 3, unloading: 3, note: "Belt full and stopped twice in five minutes" },
 ];

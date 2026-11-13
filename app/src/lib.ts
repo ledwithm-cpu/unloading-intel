@@ -2,7 +2,7 @@ export const BELT = [
   { key: "flowing", label: "Moving freight", color: "#1E8E7E" },
   { key: "running_empty", label: "Running near-empty", color: "#E2B93B" },
   { key: "stopped_loaded", label: "Stopped with freight on it", color: "#C8463E" },
-  { key: "stopped_empty", label: "Stopped and empty", color: "#8A97A0" },
+  { key: "stopped_empty", label: "Stopped, near-empty", color: "#8A97A0" },
 ];
 export const PEOPLE = [
   { key: "unloading", label: "Unloading", color: "#1E8E7E" },
@@ -12,7 +12,7 @@ export const PEOPLE = [
 export const DETAIL_LABEL: Record<string, string> = { leaning: "Leaning on belt", crossing: "Crossing the belt" };
 export const EVENT_LABEL: Record<string, string> = {
   stopped_loaded: "Belt stopped with freight on it",
-  stopped_empty: "Belt stopped and empty",
+  stopped_empty: "Belt stopped, near-empty",
   running_empty: "Belt running near-empty",
   low_engagement: "Three or more present, at most one unloading",
   release_window: "People free to help another bay",

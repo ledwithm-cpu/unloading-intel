@@ -10,7 +10,7 @@ import sqlite3
 import numpy as np
 
 LABEL = {"flowing": "Flowing", "running_empty": "Running near-empty", "stopped_loaded": "Stopped with freight",
-         "stopped_empty": "Stopped and empty", "release_window": "People free to release",
+         "stopped_empty": "Stopped, near-empty", "release_window": "People free to release",
          "under_pressure": "Bay under pressure", "low_engagement": "3+ present, at most 1 unloading",
          "belt_crossing": "Crossed the belt", "leaning_on_belt": "Leaning on the belt"}
 
@@ -66,7 +66,7 @@ def build(con):
             "why": f"While the belt was stopped, {float(waiting[stopped].sum() / present[stopped].sum()):.0%} of the people in view were waiting, "
                    f"against {wait_share['flowing']:.0%} while it flowed. A stop holds up everyone downstream of it.",
             "action": "Find out what triggers each stop. The clips show awkward items (wire cages, long rolls) being handled on the belt during several of them; "
-                      "routing those off-belt is the first thing to test.",
+                      "routing those off-belt is the first thing to test. In others, people at the far end stop the belt to deal with a single item (8:59).",
             "next": "Join this timeline to scan or warehouse-system data by time. Each stop then shows the freight scanned just before it, so the system can name the items that stop the belt without anyone having to ask. Not built here: this prototype has no scan data.",
             "metric": {"label": "Belt stopped", "value": f"{share['stopped_loaded'] + share['stopped_empty']:.0%}"},
             "evidence": evidence(("stopped_loaded", "stopped_empty")),
@@ -101,7 +101,7 @@ def build(con):
             "what": f"{float(belt_work.sum() / present.sum()):.0%} of person-time was spent unloading (picking from the belt, carrying, returning), "
                     f"{float(off_belt.sum() / present.sum()):.0%} on other activity and {float(waiting.sum() / present.sum()):.0%} waiting. "
                     f"While the belt flowed, {float(belt_work[state == 'flowing'].mean()):.1f} of {float(present[state == 'flowing'].mean()):.1f} people were unloading.",
-            "why": f"Unloading falls from {share_of(belt_work, 'flowing'):.0%} when the belt flows to {share_of(belt_work, 'stopped_empty'):.0%} when it is stopped and empty, "
+            "why": f"Unloading falls from {share_of(belt_work, 'flowing'):.0%} when the belt flows to {share_of(belt_work, 'stopped_empty'):.0%} when it is stopped and near-empty, "
                    f"and waiting rises from {wait_share['flowing']:.0%} to {wait_share['stopped_empty']:.0%}. People follow the belt, which points at the process, not the people. "
                    f"For {low_secs / n:.0%} of the session three or more people were present with at most one unloading.",
             "action": "Fix stops and gaps first. Then look at the other activity: some is stacking and staging, some is not work, "
