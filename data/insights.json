@@ -43,6 +43,7 @@
    "what": "12 stops of 10 seconds or more, 6.9 minutes in total. 4.5 of those minutes had freight sitting on the belt.",
    "why": "While the belt was stopped, 35% of the people in view were waiting, against 19% while it flowed. A stop holds up everyone downstream of it.",
    "action": "Find out what triggers each stop. The clips show awkward items (wire cages, long rolls) being handled on the belt during several of them; routing those off-belt is the first thing to test.",
+   "next": "Join this timeline to scan or warehouse-system data by time. Each stop then shows the freight scanned just before it, so the system can name the items that stop the belt without anyone having to ask. Not built here: this prototype has no scan data.",
    "metric": {
     "label": "Belt stopped",
     "value": "24%"
@@ -84,6 +85,7 @@
    "what": "8 gaps of 10 seconds or more, 4.0 minutes in total, most of them in the first six minutes (belt flowing only 39% of that time).",
    "why": "Headcount was highest during the gaps (5.4 people against 4.6 when flowing). Workers along the belt mainly take freight off it to sort, so an empty belt means the truck end is not feeding fast enough for the people waiting to sort.",
    "action": "Look at the truck end first: one more person unloading, or fewer sorters during slow feed, would close the gap. A camera inside the dock door would confirm it.",
+   "next": "A camera at the dock door, or the truck arrival feed, turns supply from an inference into a measurement. The system could then flag a slow feed while it is happening, not afterwards.",
    "metric": {
     "label": "Running near-empty",
     "value": "14%"
@@ -125,6 +127,7 @@
    "what": "Freight flow averaged 46% of the best sustained minute (from 22:16). Even while flowing, 41% of the belt surface was bare.",
    "why": "The same people and the same belt have already shown the higher rate. The gap is steadiness, not speed.",
    "action": "Use the best minute as the target rate and track minutes at or near it per session.",
+   "next": "Run on the live feed and show each bay its current rate against its own best minute, so a supervisor sees a drop as it starts.",
    "metric": {
     "label": "Of best-minute rate",
     "value": "46%"
@@ -156,6 +159,7 @@
    "what": "65% of person-time was spent unloading (picking from the belt, carrying, returning), 13% on other activity and 22% waiting. While the belt flowed, 3.4 of 4.6 people were unloading.",
    "why": "Unloading falls from 74% when the belt flows to 27% when it is stopped and empty, and waiting rises from 19% to 38%. People follow the belt, which points at the process, not the people. For 6% of the session three or more people were present with at most one unloading.",
    "action": "Fix stops and gaps first. Then look at the other activity: some is stacking and staging, some is not work, and this camera cannot yet tell them apart.",
+   "next": "A model that looks at short clips, not only body position, to separate loading, stacking and idle movement. The review corrections already collected would score it.",
    "metric": {
     "label": "Time unloading",
     "value": "65%"
@@ -196,7 +200,8 @@
    "title": "People could have been released to another bay, in short windows",
    "what": "3 windows where the belt was idle and about two people were waiting, lasting 27-42 seconds (3.8 person-minutes). 1 window where this bay was saturated with nobody waiting.",
    "why": "The first six minutes had 5.6 people and the belt flowing 39% of the time; the rest had 4.3 people and 68%. Fewer people moved more freight, so the bigger win is the staffing level per phase, not second-by-second moves.",
-   "action": "With every bay on the same measure, match each bay's release windows against other bays' pressure windows and alert a supervisor when a move is worth the walk. On this evidence, start by releasing one person during slow feed from the truck.",
+   "action": "Start by releasing one person during slow feed from the truck, and check that flow holds.",
+   "next": "With every bay measured the same way, the system matches one bay's release windows against another bay's pressure and alerts a supervisor when a move is worth the walk. The Site view page shows this with example data.",
    "metric": {
     "label": "Release windows",
     "value": "3"

@@ -19,7 +19,8 @@ export default function Insights({ cards, onJump }: { cards: Card[]; onJump: (t:
                 <dl>
                   <dt>What happened</dt><dd>{c.what}</dd>
                   <dt>Why it matters</dt><dd>{c.why}</dd>
-                  <dt>What to try</dt><dd>{c.action}</dd>
+                  <dt>What to try now</dt><dd>{c.action}</dd>
+                  {c.next && (<><dt>Where the system goes next</dt><dd>{c.next}</dd></>)}
                 </dl>
                 <div className="ins-ev">
                   <span>See it in the video</span>

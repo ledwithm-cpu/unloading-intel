@@ -167,7 +167,7 @@ def cmd_events(con, a):
 def cmd_opportunities(con, a):
     ins = json.load(open(Path(find_db()).parent / "insights.json"))
     out({"headline": ins["headline"]["sentence"],
-         "opportunities": [{"finding": c["title"], "what_happened": c["what"], "why_it_matters": c["why"], "what_to_try": c["action"],
+         "opportunities": [{"finding": c["title"], "what_happened": c["what"], "why_it_matters": c["why"], "what_to_try": c["action"], "where_the_system_goes_next": c.get("next"),
                             "evidence": [{"at": ts(e["t_sec"]), "jump_to_sec": e["t_sec"], "what": e["label"]} for e in c["evidence"]]}
                            for c in ins["cards"]]})
 

@@ -4,7 +4,7 @@ export type Ev = {
   present: number; unloading: number; waiting: number; occupancy: number; details: Record<string, any>;
 };
 export type Evidence = { t_sec: number; label: string; event_id?: number };
-export type Card = { id: string; title: string; what: string; why: string; action: string; metric: { label: string; value: string }; evidence: Evidence[] };
+export type Card = { id: string; title: string; what: string; why: string; action: string; next?: string; metric: { label: string; value: string }; evidence: Evidence[] };
 export type Session = {
   video: { src: string; width: number; height: number; duration: number; clock_start: string; date: string; sample_fps: number };
   legend: { states: string[]; details: (string | null)[]; zones: string[]; belt_states: string[] };

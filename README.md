@@ -16,6 +16,22 @@ Built for the Protex AI Forward Deployed Engineer take-home, on the supplied 28.
 
 People figures are estimates; belt figures are the reliable ones. See [Accuracy](#accuracy).
 
+## Designed to be deployable: privacy first
+
+Cameras that measure how people work meet resistance from the people being filmed, and from works councils and unions. The
+design choices below are there so the system can be put in front of a workforce.
+
+- **It reports by working area, not by person.** The questions an operations manager asked (is the belt used, are there enough
+  people at each position, where does the line stall) are answered per area and per minute. Nobody is ranked or named.
+- **No identities.** People are anonymous numbers that do not persist. There is no face recognition.
+- **Faces are blurred by default**, using the head position the pose model already produces, so privacy costs no extra model
+  or compute.
+- **Processing is local.** No footage or images leave the machine. The whole video processes in about 13 minutes on two CPU cores.
+- **Footage stays out of the repository.** The source video, review reel and stills are excluded.
+
+One honest note: reporting by area was also forced by the data. The tracker did not hold identities well enough to follow
+individuals (see Limitations), so per-person figures would not have been reliable even if they were wanted.
+
 ## Quick start
 
 Requirements: Python 3.10+, Node 18+, ffmpeg.
@@ -148,7 +164,8 @@ stopped, far end vs pile side) held in every version; absolute levels should be 
   detector found parcels on the belt reliably but not parcels in hands.
 - **The truck is off camera.** Supply rate is inferred.
 - **Why the belt stops is not measured.** The data shows what people were doing around each stop, not the cause.
-- **Individuals are not followed.** Tracking produced 249 ids for about eight people, so results are by position and working area.
+- **Tracking does not hold identities.** It produced 249 ids for about eight people, so nothing here follows one person across
+  the session. Results are by position and working area, which is also the privacy-preserving choice (see above).
 - **Belt crossings are candidates.** The rule also catches long reaches across the belt.
 - **Face blur covers detected people only.** Anyone the detector misses in a frame is not blurred in that frame.
 - **One session, one bay, one camera.** Nothing here generalises to the site without more footage.
@@ -161,16 +178,10 @@ stopped, far end vs pile side) held in every version; absolute levels should be 
 - **Richer activity labels.** Replace or supplement `analytics/activity.py` with a vision-language model over short person clips
   (loading, carrying, leaning, smoking). The review label set already exists to score it. This sends worker images to a model, so
   it is a privacy decision as well as a technical one.
-- **Process data.** Join `timeline` to scans or a WMS feed on time, to connect a stop to the freight that caused it.
+- **Process data.** Join `timeline` to scans or a WMS feed on time, so each stop shows the freight scanned just before it. This is
+  the step that lets the system suggest a cause for a stop; today it can only show what people were doing around it.
 - **Live operation.** The stages are already separate; run `detect` and `belt` on a stream and append to the same tables.
 - **A second camera at the dock door** would turn the largest inference (supply from the truck) into a measurement.
-
-## Privacy
-
-- Processing is local. No footage or images leave the machine.
-- People are anonymous track numbers. No face recognition, no identities.
-- The app plays a face-blurred copy of the video.
-- The source video, the review reel and still frames are excluded from the repository.
 
 ## The Claude skill
 

@@ -67,6 +67,7 @@ def build(con):
                    f"against {wait_share['flowing']:.0%} while it flowed. A stop holds up everyone downstream of it.",
             "action": "Find out what triggers each stop. The clips show awkward items (wire cages, long rolls) being handled on the belt during several of them; "
                       "routing those off-belt is the first thing to test.",
+            "next": "Join this timeline to scan or warehouse-system data by time. Each stop then shows the freight scanned just before it, so the system can name the items that stop the belt without anyone having to ask. Not built here: this prototype has no scan data.",
             "metric": {"label": "Belt stopped", "value": f"{share['stopped_loaded'] + share['stopped_empty']:.0%}"},
             "evidence": evidence(("stopped_loaded", "stopped_empty")),
         },
@@ -79,6 +80,7 @@ def build(con):
                    f"{float(present[state == 'flowing'].mean()):.1f} when flowing). Workers along the belt mainly take freight off it to sort, "
                    "so an empty belt means the truck end is not feeding fast enough for the people waiting to sort.",
             "action": "Look at the truck end first: one more person unloading, or fewer sorters during slow feed, would close the gap. A camera inside the dock door would confirm it.",
+            "next": "A camera at the dock door, or the truck arrival feed, turns supply from an inference into a measurement. The system could then flag a slow feed while it is happening, not afterwards.",
             "metric": {"label": "Running near-empty", "value": f"{share['running_empty']:.0%}"},
             "evidence": evidence(("running_empty",)),
         },
@@ -89,6 +91,7 @@ def build(con):
                     f"Even while flowing, {1 - float(occ[state == 'flowing'].mean()):.0%} of the belt surface was bare.",
             "why": "The same people and the same belt have already shown the higher rate. The gap is steadiness, not speed.",
             "action": "Use the best minute as the target rate and track minutes at or near it per session.",
+            "next": "Run on the live feed and show each bay its current rate against its own best minute, so a supervisor sees a drop as it starts.",
             "metric": {"label": "Of best-minute rate", "value": f"{thr.mean() / best60.max():.0%}"},
             "evidence": [{"t_sec": best_at, "label": f"{mmss(best_at)} · best sustained minute"}] + evidence(("stopped_empty",), 2),
         },
@@ -103,6 +106,7 @@ def build(con):
                    f"For {low_secs / n:.0%} of the session three or more people were present with at most one unloading.",
             "action": "Fix stops and gaps first. Then look at the other activity: some is stacking and staging, some is not work, "
                       "and this camera cannot yet tell them apart.",
+            "next": "A model that looks at short clips, not only body position, to separate loading, stacking and idle movement. The review corrections already collected would score it.",
             "metric": {"label": "Time unloading", "value": f"{float(belt_work.sum() / present.sum()):.0%}"},
             "evidence": evidence(("low_engagement",), 4),
         },
@@ -120,8 +124,8 @@ def build(con):
         "why": f"The first six minutes had {float(present[early].mean()):.1f} people and the belt flowing {float((state[early] == 'flowing').mean()):.0%} of the time; "
                f"the rest had {float(present[late].mean()):.1f} people and {float((state[late] == 'flowing').mean()):.0%}. "
                "Fewer people moved more freight, so the bigger win is the staffing level per phase, not second-by-second moves.",
-        "action": "With every bay on the same measure, match each bay's release windows against other bays' pressure windows and alert a supervisor "
-                  "when a move is worth the walk. On this evidence, start by releasing one person during slow feed from the truck.",
+        "action": "Start by releasing one person during slow feed from the truck, and check that flow holds.",
+        "next": "With every bay measured the same way, the system matches one bay's release windows against another bay's pressure and alerts a supervisor when a move is worth the walk. The Site view page shows this with example data.",
         "metric": {"label": "Release windows", "value": str(len(rel))},
         "evidence": evidence(("release_window", "under_pressure"), 4),
     })
