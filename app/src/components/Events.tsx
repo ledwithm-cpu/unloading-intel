@@ -4,7 +4,7 @@ import { EVENT_GROUP, EVENT_LABEL, clock, dur, mmss } from "../lib";
 
 const GROUPS = ["All", "Belt", "People", "Safety"];
 
-export default function Events({ session, onJump }: { session: Session; onJump: (t: number) => void }) {
+export default function Events({ session, onJump, panel }: { session: Session; onJump: (t: number) => void; panel?: React.ReactNode }) {
   const [group, setGroup] = useState("All");
   const [all, setAll] = useState(false);
   const rows = useMemo(() => session.events
@@ -20,6 +20,7 @@ export default function Events({ session, onJump }: { session: Session; onJump: 
           {GROUPS.map((g) => <button key={g} role="tab" aria-selected={group === g} className={group === g ? "is-on" : ""} onClick={() => setGroup(g)}>{g}</button>)}
         </div>
       </div>
+      {panel}
       <table>
         <thead><tr><th>Time</th><th>What happened</th><th>Lasted</th><th>People there</th><th>Waiting</th><th /></tr></thead>
         <tbody>

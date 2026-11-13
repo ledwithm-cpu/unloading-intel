@@ -79,7 +79,7 @@ The source video is not in the repository because it shows identifiable workers.
 | Storage | `data/unloading.db` | One SQLite file: every detection, 17 pose keypoints, track ids, belt samples | |
 | Configuration | `config/` | `zones.json` (polygons) and `rules.json` (every threshold) | |
 | Analytics | `analytics/` | Worker activity, per-second timeline, events, safety, insight cards, export, evaluation | No |
-| Application | `app/` | React + TypeScript + Vite. Reads static JSON; no server | Playback only |
+| Application | `app/` | React + TypeScript + Vite. Reads static JSON; no server. Sensitivity settings recompute belt states and moments in the browser | Playback only |
 | Claude skill | `skill/unloading-intel/` | Instructions plus a query script over the database | No |
 
 The split that matters: **anything that needs pixels happens once, in `pipeline/`. Everything else runs from the database in seconds.**

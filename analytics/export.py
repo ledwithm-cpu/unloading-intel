@@ -24,7 +24,7 @@ def main():
     stride = int(meta["sample_stride"])
     src_fps = float(meta["src_fps"])
 
-    tl = con.execute("SELECT t_sec, belt_state, occupancy, throughput, n_present, n_belt_work, n_off_belt, n_waiting "
+    tl = con.execute("SELECT t_sec, belt_state, occupancy, throughput, n_present, n_belt_work, n_off_belt, n_waiting, belt_moving "
                      "FROM timeline ORDER BY t_sec").fetchall()
     session = {
         "video": {"src": "video/unloading.mp4", "width": int(meta["width"]), "height": int(meta["height"]),
@@ -37,13 +37,15 @@ def main():
             "occupancy": [round(r[2], 2) for r in tl],
             "throughput": [round(r[3] * 1000, 1) for r in tl],
             "present": [r[4] for r in tl], "unloading": [r[5] for r in tl],
-            "other": [r[6] for r in tl], "waiting": [r[7] for r in tl],
+            "other": [r[6] for r in tl], "waiting": [r[7] for r in tl], "moving": [r[8] for r in tl],
         },
         "events": [dict(zip(("id", "type", "start", "end", "duration", "present", "unloading", "waiting", "occupancy", "details"),
                             (*r[:9], json.loads(r[9]))))
                    for r in con.execute("SELECT id,type,start_sec,end_sec,duration_sec,people_present,people_belt_work,"
                                         "people_waiting,occupancy,details FROM events ORDER BY start_sec")],
         "insights": json.load(open("data/insights.json")),
+        "sensitivity_defaults": {"near_empty_pct": 20, "min_stop_seconds": json.load(open("config/rules.json"))["events"]["belt_min_seconds"],
+                                 "min_free_seconds": json.load(open("config/rules.json"))["reallocation"]["release_min_seconds"]},
         "review": json.load(open("data/review_results.json")),
     }
     from . import evaluate

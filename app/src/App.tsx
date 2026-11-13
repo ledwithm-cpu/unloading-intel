@@ -7,7 +7,6 @@ import Site from "./pages/Site";
 
 const PAGES = [
   { id: "session", label: "Session" },
-  { id: "accuracy", label: "How accurate is this?" },
   { id: "zones", label: "Zones" },
   { id: "site", label: "Site view" },
 ];
@@ -61,8 +60,9 @@ export default function App() {
         {page === "site" && <Site session={session} />}
       </main>
       <footer className="foot">
-        Prototype built on 28.5 minutes of footage from one camera. Figures are measured by computer vision and checked by hand on a sample;
-        see “How accurate is this?” for what that means.
+        <button className="foot-link" onClick={() => { setPage("accuracy"); window.scrollTo(0, 0); }}>How accurate is this?</button>
+        <p>Prototype built on 28.5 minutes of footage from one camera. Figures are measured by computer vision and checked by hand on a
+        sample. Faces are blurred and no one is identified.</p>
       </footer>
     </div>
   );

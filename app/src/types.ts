@@ -1,3 +1,4 @@
+export type Sensitivity = { near_empty_pct: number; min_stop_seconds: number; min_free_seconds: number };
 export type Zone = { label: string; kind: string; polygon: number[][]; note?: string };
 export type Ev = {
   id: number; type: string; start: number; end: number; duration: number;
@@ -9,7 +10,8 @@ export type Session = {
   video: { src: string; width: number; height: number; duration: number; clock_start: string; date: string; sample_fps: number };
   legend: { states: string[]; details: (string | null)[]; zones: string[]; belt_states: string[] };
   zones: { zones: Record<string, Zone>; zone_priority: string[] };
-  timeline: { belt_state: number[]; occupancy: number[]; throughput: number[]; present: number[]; unloading: number[]; other: number[]; waiting: number[] };
+  timeline: { belt_state: number[]; occupancy: number[]; throughput: number[]; present: number[]; unloading: number[]; other: number[]; waiting: number[]; moving: number[] };
+  sensitivity_defaults: Sensitivity;
   events: Ev[];
   insights: { headline: any; cards: Card[] };
   review: any;
