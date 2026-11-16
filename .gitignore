@@ -12,3 +12,4 @@ dist/
 .DS_Store
 app/public/video/
 app/public/data/frame.jpg
+data/*.jpg
