@@ -97,8 +97,10 @@
     {
       "moment": 13,
       "track": 377,
-      "note": "Reviewer reports a man seated among the parcels smoking a pipe: a fire risk. Pose data cannot see this.",
-      "label": "Someone smoking a pipe among the parcels: spotted by a reviewer, not detected by the system"
+      "note": "Reviewer saw a man in among the parcels on the right-hand side smoking a pipe, at about 13:30: a fire risk. Pose data cannot see this.",
+      "label": "Someone smoking a pipe among the parcels: spotted by a reviewer, not detected by the system",
+      "t_sec": 810,
+      "video_time": "13:30"
     }
   ]
 }

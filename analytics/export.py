@@ -52,7 +52,7 @@ def main():
     labels = json.load(open("data/review_labels.json"))
     reel = {m["moment"]: m["t_sec"] for m in json.load(open("data/review_reel.json"))}
     for k, ob in enumerate(labels.get("observations_not_detectable_by_pose", [])):
-        t0 = reel[ob["moment"]]
+        t0 = ob.get("t_sec", reel.get(ob.get("moment"), 0))
         session["events"].append({"id": 900000 + k, "type": "reviewer_observation", "start": t0, "end": t0 + 5, "duration": 5,
                                    "present": session["timeline"]["present"][t0], "unloading": 0, "waiting": 0, "occupancy": 0,
                                    "details": {"label": ob["label"], "note": ob["note"], "source": "human review"}})

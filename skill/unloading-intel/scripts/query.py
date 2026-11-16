@@ -180,7 +180,7 @@ def cmd_safety(con, a):
          "leaning_on_belt": {"count_5s_or_more": len(lean), "total_seconds": sum(d for _, d, _ in lean),
                              "seconds_while_belt_moving": sum(d for _, d, x in lean if json.loads(x)["belt_moving"]),
                              "longest": [{"at": ts(s), "jump_to_sec": s, "seconds": d, "belt_moving": json.loads(x)["belt_moving"]} for s, d, x in lean[:5]]},
-         "not_detectable": "Smoking, phone use and footwear cannot be seen from body position. A reviewer reported a man smoking among the parcels at about 19:27."})
+         "not_detectable": "Smoking, phone use and footwear cannot be seen from body position. A reviewer reported a man smoking a pipe among the parcels at about 13:30 [06:18:27]."})
 
 
 def cmd_schema(con, a):
