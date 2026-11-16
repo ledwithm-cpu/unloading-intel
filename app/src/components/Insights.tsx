@@ -5,6 +5,19 @@ export default function Insights({ cards, onJump }: { cards: Card[]; onJump: (t:
   const [open, setOpen] = useState(cards[0]?.id);
   return (
     <section className="insights" aria-label="What we found">
+      <div className="ins-ev" style={{ marginBottom: 16 }}>
+        <span>Walkthrough moments</span>
+        {[
+          [2, "0:00 · Busy belt, people loading"],
+          [572, "9:32 · Stopped with freight on it"],
+          [270, "4:30 · Belt near-empty, full team"],
+          [1336, "22:16 · The line's best minute"],
+          [164, "2:44 · Crossing the belt"],
+          [810, "13:30 · Smoking among the parcels"],
+        ].map(([t, label]) => (
+          <button key={label as string} className="jump" onClick={() => onJump(t as number)}>{label}</button>
+        ))}
+      </div>
       <h2>What we found</h2>
       {cards.map((c) => {
         const on = open === c.id;
