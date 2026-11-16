@@ -1,21 +1,104 @@
 {
   "note": "Person-level corrections from human review of data/review_reel.mp4 (20 moments, 5 s each). Used by analytics/evaluate.py to score every rule change. 'expect' is what the reviewer said the person was doing.",
   "labels": [
-    {"moment": 2,  "track": 16,  "expect": "not_unloading", "round": 1, "note": "at far end, not working"},
-    {"moment": 5,  "track": 103, "expect": "not_unloading", "round": 1, "note": "far left, not working"},
-    {"moment": 12, "track": 330, "expect": "not_unloading", "round": 1, "note": "not working"},
-    {"moment": 12, "track": 366, "expect": "not_unloading", "round": 1, "note": "not working"},
-    {"moment": 12, "track": 377, "expect": "not_unloading", "round": 1, "note": "seated, not working"},
-    {"moment": 15, "track": 391, "expect": "not_unloading", "round": 1, "note": "at far end, not working"},
-    {"moment": 2,  "track": 27,  "expect": "unloading",     "round": 2, "note": "pile side, clearing the belt"},
-    {"moment": 1,  "track": 16,  "expect": "unloading",     "round": 3, "note": "carrying a box away from the far end"},
-    {"moment": 3,  "track": 82,  "expect": "unloading",     "round": 4, "note": "LOADING: taking parcels from a cage and adding them to the belt"},
-    {"moment": 3,  "track": 75,  "expect": "not_unloading", "round": 4, "note": "leaning on the belt only"},
-    {"moment": 1,  "track": 11,  "expect": "not_unloading", "round": 4, "note": "at dock door, not unloading at all"},
-    {"moment": 20, "track": 444, "expect": "not_unloading", "round": 4, "note": "jumping over the belt"},
-    {"moment": 3,  "track": 87,  "expect": "not_a_person",  "round": 4, "note": "a parcel detected as a worker"}
+    {
+      "moment": 2,
+      "track": 16,
+      "expect": "not_unloading",
+      "round": 1,
+      "note": "at far end, not working"
+    },
+    {
+      "moment": 5,
+      "track": 103,
+      "expect": "not_unloading",
+      "round": 1,
+      "note": "far left, not working"
+    },
+    {
+      "moment": 12,
+      "track": 330,
+      "expect": "not_unloading",
+      "round": 1,
+      "note": "not working"
+    },
+    {
+      "moment": 12,
+      "track": 366,
+      "expect": "not_unloading",
+      "round": 1,
+      "note": "not working"
+    },
+    {
+      "moment": 12,
+      "track": 377,
+      "expect": "not_unloading",
+      "round": 1,
+      "note": "seated, not working"
+    },
+    {
+      "moment": 15,
+      "track": 391,
+      "expect": "not_unloading",
+      "round": 1,
+      "note": "at far end, not working"
+    },
+    {
+      "moment": 2,
+      "track": 27,
+      "expect": "unloading",
+      "round": 2,
+      "note": "pile side, clearing the belt"
+    },
+    {
+      "moment": 1,
+      "track": 16,
+      "expect": "unloading",
+      "round": 3,
+      "note": "carrying a box away from the far end"
+    },
+    {
+      "moment": 3,
+      "track": 82,
+      "expect": "unloading",
+      "round": 4,
+      "note": "LOADING: taking parcels from a cage and adding them to the belt"
+    },
+    {
+      "moment": 3,
+      "track": 75,
+      "expect": "not_unloading",
+      "round": 4,
+      "note": "leaning on the belt only"
+    },
+    {
+      "moment": 1,
+      "track": 11,
+      "expect": "not_unloading",
+      "round": 4,
+      "note": "at dock door, not unloading at all"
+    },
+    {
+      "moment": 20,
+      "track": 444,
+      "expect": "not_unloading",
+      "round": 4,
+      "note": "jumping over the belt"
+    },
+    {
+      "moment": 3,
+      "track": 87,
+      "expect": "not_a_person",
+      "round": 4,
+      "note": "a parcel detected as a worker"
+    }
   ],
   "observations_not_detectable_by_pose": [
-    {"moment": 13, "track": 377, "note": "Reviewer reports a man seated among the parcels smoking a pipe: a fire risk. Pose data cannot see this."}
+    {
+      "moment": 13,
+      "track": 377,
+      "note": "Reviewer reports a man seated among the parcels smoking a pipe: a fire risk. Pose data cannot see this.",
+      "label": "Someone smoking a pipe among the parcels: spotted by a reviewer, not detected by the system"
+    }
   ]
 }

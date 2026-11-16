@@ -48,6 +48,15 @@ def main():
                                  "min_free_seconds": json.load(open("config/rules.json"))["reallocation"]["release_min_seconds"]},
         "review": json.load(open("data/review_results.json")),
     }
+    # observations a person made while reviewing the clips, which the system cannot detect (e.g. smoking)
+    labels = json.load(open("data/review_labels.json"))
+    reel = {m["moment"]: m["t_sec"] for m in json.load(open("data/review_reel.json"))}
+    for k, ob in enumerate(labels.get("observations_not_detectable_by_pose", [])):
+        t0 = reel[ob["moment"]]
+        session["events"].append({"id": 900000 + k, "type": "reviewer_observation", "start": t0, "end": t0 + 5, "duration": 5,
+                                   "present": session["timeline"]["present"][t0], "unloading": 0, "waiting": 0, "occupancy": 0,
+                                   "details": {"label": ob["label"], "note": ob["note"], "source": "human review"}})
+    session["events"].sort(key=lambda e: e["start"])
     from . import evaluate
     ok, total = evaluate.score(con, verbose=False)
     session["review"]["corrections"] = {"satisfied": ok, "total": total}

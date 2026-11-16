@@ -11,7 +11,7 @@ export default function Events({ session, onJump, panel }: { session: Session; o
     .filter((e) => group === "All" || EVENT_GROUP[e.type] === group)
     .filter((e) => e.type !== "leaning_on_belt" || e.duration >= 15)
     .sort((a, b) => a.start - b.start), [session, group]);
-  const shown = all ? rows : [...rows].sort((a, b) => b.duration - a.duration).slice(0, 8).sort((a, b) => a.start - b.start);
+  const shown = all || group !== "All" ? rows : [...rows].sort((a, b) => b.duration - a.duration).slice(0, 8).sort((a, b) => a.start - b.start);
   return (
     <section className="events" aria-label="Moments to review">
       <div className="events-top">
@@ -27,7 +27,7 @@ export default function Events({ session, onJump, panel }: { session: Session; o
           {shown.map((e) => (
             <tr key={e.id} onClick={() => onJump(e.start)}>
               <td><strong>{mmss(e.start)}</strong><small>{clock(session.video.clock_start, e.start)}</small></td>
-              <td>{EVENT_LABEL[e.type] ?? e.type}{e.details?.belt_moving ? <em> while the belt was moving</em> : null}</td>
+              <td>{e.details?.label ?? EVENT_LABEL[e.type] ?? e.type}{e.details?.belt_moving ? <em> while the belt was moving</em> : null}</td>
               <td>{dur(e.duration)}</td>
               <td>{e.present ? e.present.toFixed(1) : ""}</td>
               <td>{EVENT_GROUP[e.type] === "Safety" ? "" : e.waiting.toFixed(1)}</td>
@@ -36,8 +36,8 @@ export default function Events({ session, onJump, panel }: { session: Session; o
           ))}
         </tbody>
       </table>
-      {rows.length > 8 && <button className="btn ghost more" onClick={() => setAll(!all)}>{all ? "Show the 8 longest" : `Show all ${rows.length}`}</button>}
-      <p className="note">The longest moments are shown first. Leaning is listed when it lasts 15 seconds or more. Belt crossings are candidates: some are a long reach across the belt.</p>
+      {group === "All" && rows.length > 8 && <button className="btn ghost more" onClick={() => setAll(!all)}>{all ? "Show the 8 longest" : `Show all ${rows.length}`}</button>}
+      <p className="note">Under "All", the eight longest moments are shown; pick a group to see every one. Leaning is listed when it lasts 15 seconds or more. Belt crossings are candidates: some are a long reach across the belt.</p>
     </section>
   );
 }

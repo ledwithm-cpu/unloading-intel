@@ -19,11 +19,12 @@ export const EVENT_LABEL: Record<string, string> = {
   under_pressure: "Bay under pressure",
   belt_crossing: "Someone crossed the belt",
   leaning_on_belt: "Someone leaning on the belt",
+  reviewer_observation: "Spotted by a reviewer",
 };
 export const EVENT_GROUP: Record<string, string> = {
   stopped_loaded: "Belt", stopped_empty: "Belt", running_empty: "Belt",
   low_engagement: "People", release_window: "People", under_pressure: "People",
-  belt_crossing: "Safety", leaning_on_belt: "Safety",
+  belt_crossing: "Safety", leaning_on_belt: "Safety", reviewer_observation: "Safety",
 };
 export const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 export function clock(start: string, s: number) {

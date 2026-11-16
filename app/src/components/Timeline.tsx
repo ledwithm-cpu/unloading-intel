@@ -12,6 +12,7 @@ const smooth = (a: number[], k: number) => a.map((_, i) => { let s = 0, n = 0; f
 const MARKS = [
   { type: "release_window", label: "People free", color: "#6C8EAD" },
   { type: "belt_crossing", label: "Belt crossed", color: "#18242C" },
+  { type: "reviewer_observation", label: "Spotted by a reviewer", color: "#8E5BB5" },
 ];
 
 export default function Timeline({ session, t, onSeek }: { session: Session; t: number; onSeek: (t: number) => void }) {
@@ -56,7 +57,7 @@ export default function Timeline({ session, t, onSeek }: { session: Session; t: 
           <svg viewBox={`0 0 ${N} 22`} preserveAspectRatio="none" style={{ height: 22 }}>
             {session.events.filter((e) => MARKS.some((m) => m.type === e.type)).map((e) => {
               const m = MARKS.find((x) => x.type === e.type)!;
-              return <rect key={e.id} x={e.start} y={m.type === "belt_crossing" ? 12 : 2} width={Math.max(6, e.duration)} height={8} fill={m.color}><title>{EVENT_LABEL[e.type]} at {mmss(e.start)}</title></rect>;
+              return <rect key={e.id} x={e.start} y={m.type === "release_window" ? 2 : 12} width={Math.max(6, e.duration)} height={8} fill={m.color}><title>{e.details?.label ?? EVENT_LABEL[e.type]} at {mmss(e.start)}</title></rect>;
             })}
           </svg>
           <div className="tl-head" style={{ left: `${(t / N) * 100}%` }} />
